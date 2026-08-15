@@ -1,0 +1,4469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XtremeGang</title>
+<link rel="icon" type="image/png" href="https://github.com/xtremetechprograms/Xtremegngtrialsbtw/blob/main/ChatGPT%20Image%20Aug%209,%202026,%2012_34_55%20PM.png?raw=true">
+
+<link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/xtremetechprograms/TIERLIST-ICONS@main/XtremeGAngbg.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     FIREBASE SDKs (compat build — simplest to wire up by hand)
+     ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+/* =========================================================
+   TOKENS
+   ---------------------------------------------------------
+   bg-void      #05050b   deep background
+   bg-panel     #0c0c16   card / panel surface
+   bg-panel-2   #12121f   raised panel
+   line         #1e1e30   hairline borders
+   neon-blue    #22d3ff   "Xtreme" / primary accent
+   neon-red     #ff2d55   "Gang" / danger-accent
+   neon-violet  #8b5cf6   chain-link accent
+   text-hi      #eef0ff   primary text
+   text-mid     #8d8fb3   secondary text
+   text-low     #4c4d68   disabled / faint
+   ========================================================= */
+:root{
+  --bg-void:#05050b;
+  --bg-panel:#0c0c16;
+  --bg-panel-2:#12121f;
+  --line:#1e1e30;
+  --neon-blue:#22d3ff;
+  --neon-blue-dim:#0e6d85;
+  --neon-red:#ff2d55;
+  --neon-red-dim:#7a1030;
+  --neon-violet:#8b5cf6;
+  --text-hi:#eef0ff;
+  --text-mid:#8d8fb3;
+  --text-low:#4c4d68;
+  --font-display:'Orbitron', sans-serif;
+  --font-body:'Rajdhani', sans-serif;
+  --font-mono:'Share Tech Mono', monospace;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg-void);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* faint scanline / grid atmosphere over everything */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:
+    linear-gradient(rgba(34,211,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,255,0.035) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(ellipse at 50% 30%, black 0%, transparent 75%);
+}
+
+::selection{background:var(--neon-blue); color:#05050b;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg-void);}
+::-webkit-scrollbar-thumb{background:var(--neon-blue-dim); border-radius:0;}
+
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer;}
+input{font-family:inherit;}
+
+.hidden{display:none !important;}
+
+/* =========================================================
+   INTRO / STARTUP SCREEN
+   ========================================================= */
+#intro-screen{
+  position:fixed; inset:0;
+  z-index:100;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  background:
+    radial-gradient(ellipse at 50% 40%, #0b0f1c 0%, #05050b 70%);
+  overflow:hidden;
+}
+
+.intro-stage{
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  height:150px;
+  width:100%;
+}
+
+/* ---- WORD 1: XtremeGang ---- */
+.word1{
+  position:relative;
+  display:flex;
+  align-items:baseline;
+  font-family:var(--font-display);
+  font-weight:900;
+  font-size:clamp(2.6rem, 8vw, 5.5rem);
+  letter-spacing:2px;
+}
+
+.x-letter{
+  color:var(--neon-blue);
+  text-shadow:0 0 12px var(--neon-blue), 0 0 34px rgba(34,211,255,0.6);
+  transform:translateX(-140vw);
+  opacity:0;
+}
+.x-letter.run{
+  animation:slideInX 0.5s cubic-bezier(.19,1,.22,1) forwards;
+}
+@keyframes slideInX{
+  0%{transform:translateX(-140vw); opacity:0;}
+  100%{transform:translateX(0); opacity:1;}
+}
+
+/* the chain that carries "treme" down and snaps */
+.chain-wrap{
+  position:relative;
+  display:inline-block;
+  color:var(--neon-blue);
+  text-shadow:0 0 12px var(--neon-blue), 0 0 34px rgba(34,211,255,0.6);
+  opacity:0;
+  transform:translateY(-90px);
+}
+.chain-wrap.drop{
+  animation:chainDrop 0.9s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.chain-wrap.settle{
+  animation:chainSettle 0.5s ease-out forwards;
+}
+@keyframes chainDrop{
+  0%{opacity:0; transform:translateY(-90px);}
+  60%{opacity:1; transform:translateY(6px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+@keyframes chainSettle{
+  0%{opacity:1; transform:translateY(0) rotate(0);}
+  30%{opacity:1; transform:translateY(3px) rotate(-2deg);}
+  60%{opacity:1; transform:translateY(-2px) rotate(2deg);}
+  100%{opacity:1; transform:translateY(0) rotate(0);}
+}
+
+.chain-link{
+  position:absolute;
+  top:-46px;
+  width:3px;
+  height:44px;
+  background:linear-gradient(var(--neon-violet), #4c3a8f);
+  box-shadow:0 0 8px var(--neon-violet);
+  transform-origin:top center;
+}
+.chain-link.left{left:6px;}
+.chain-link.right{right:6px;}
+.chain-link.snap-left{
+  animation:snapLeft 0.55s ease-in forwards;
+}
+.chain-link.snap-right{
+  animation:snapRight 0.55s ease-in forwards;
+}
+@keyframes snapLeft{
+  0%{transform:rotate(0) translateY(0); opacity:1;}
+  100%{transform:rotate(-70deg) translateY(60px) translateX(-40px); opacity:0;}
+}
+@keyframes snapRight{
+  0%{transform:rotate(0) translateY(0); opacity:1;}
+  100%{transform:rotate(70deg) translateY(60px) translateX(40px); opacity:0;}
+}
+
+.gang-letter{
+  color:var(--neon-red);
+  text-shadow:0 0 12px var(--neon-red), 0 0 34px rgba(255,45,85,0.6);
+  opacity:0;
+  margin-left:6px;
+}
+.gang-letter.run{
+  animation:revealGang 0.9s ease-out forwards;
+}
+@keyframes revealGang{
+  0%{opacity:0; letter-spacing:14px; filter:blur(6px);}
+  100%{opacity:1; letter-spacing:2px; filter:blur(0);}
+}
+
+/* ---- WORD 2: By SaumyaXtreme ---- */
+.word2{
+  margin-top:18px;
+  display:flex;
+  gap:10px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:clamp(1rem, 3vw, 1.5rem);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+}
+.by-word{ transform:translateX(-60vw); opacity:0; }
+.author-word{
+  transform:translateX(60vw); opacity:0;
+  color:var(--neon-blue);
+}
+.by-word.run{ animation:inLeft 0.5s ease-out forwards; }
+.author-word.run{ animation:inRight 0.5s ease-out forwards; }
+@keyframes inLeft{ to{ transform:translateX(0); opacity:1; } }
+@keyframes inRight{ to{ transform:translateX(0); opacity:1; } }
+
+.word2.zoom{ animation:zoomPulse 0.6s ease-in-out; }
+@keyframes zoomPulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.22); text-shadow:0 0 18px var(--neon-blue);}
+  100%{transform:scale(1);}
+}
+
+/* ---- tips ---- */
+.tip-line{
+  margin-top:34px;
+  height:24px;
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  color:var(--text-mid);
+  text-align:center;
+  max-width:640px;
+  padding:0 16px;
+  opacity:0;
+}
+.tip-line.show{ animation:tipFade 1.1s ease-in-out forwards; }
+@keyframes tipFade{
+  0%{opacity:0; transform:translateY(6px);}
+  15%{opacity:1; transform:translateY(0);}
+  85%{opacity:1;}
+  100%{opacity:0; transform:translateY(-6px);}
+}
+
+/* ---- progress bar ---- */
+.progress-track{
+  position:absolute;
+  bottom:60px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(420px, 70vw);
+  height:3px;
+  background:var(--line);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, var(--neon-blue), var(--neon-red));
+  box-shadow:0 0 10px var(--neon-blue);
+  transition:width linear;
+}
+
+/* =========================================================
+   LOGIN / REGISTER SCREEN
+   ========================================================= */
+#auth-screen{
+  position:fixed; inset:0;
+  z-index:90;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(ellipse at 50% 20%, #0b0f1c 0%, #05050b 65%);
+  padding:24px;
+}
+
+.auth-box{
+  position:relative;
+  width:100%;
+  max-width:400px;
+  background:var(--bg-panel);
+  border:1px solid var(--line);
+  padding:38px 32px 32px;
+  box-shadow:0 0 0 1px rgba(34,211,255,0.06), 0 0 40px rgba(34,211,255,0.08);
+}
+.auth-box::before{
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--neon-blue), var(--neon-red));
+}
+.auth-box::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  border:1px solid transparent;
+  box-shadow:inset 0 0 30px rgba(34,211,255,0.04);
+}
+
+.auth-heading{
+  font-family:var(--font-display);
+  font-weight:900;
+  font-size:1.6rem;
+  text-align:center;
+  letter-spacing:1px;
+  margin-bottom:2px;
+}
+.auth-heading .hx{color:var(--neon-blue); text-shadow:0 0 10px var(--neon-blue);}
+.auth-heading .hg{color:var(--neon-red); text-shadow:0 0 10px var(--neon-red);}
+.auth-sub{
+  text-align:center;
+  color:var(--text-low);
+  font-size:0.72rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  font-family:var(--font-mono);
+  margin-bottom:26px;
+}
+
+.field{ margin-bottom:16px; }
+.field label{
+  display:block;
+  font-size:0.72rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+  margin-bottom:6px;
+  font-family:var(--font-mono);
+}
+.field input{
+  width:100%;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  padding:10px 12px;
+  font-size:0.95rem;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.field input:focus{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 0 1px var(--neon-blue), 0 0 12px rgba(34,211,255,0.35);
+}
+.field input:focus-visible{
+  outline:2px solid var(--neon-blue);
+  outline-offset:2px;
+}
+
+/* captcha row */
+.captcha-row{ display:flex; gap:10px; align-items:center; margin-bottom:16px; }
+#captcha-canvas{
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  flex-shrink:0;
+}
+.captcha-refresh{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--neon-blue);
+  width:38px; height:38px;
+  font-size:1rem;
+  flex-shrink:0;
+  transition:border-color .2s, box-shadow .2s;
+}
+.captcha-refresh:hover{ border-color:var(--neon-blue); box-shadow:0 0 10px rgba(34,211,255,0.4); }
+
+.auth-submit{
+  width:100%;
+  margin-top:8px;
+  padding:12px;
+  background:linear-gradient(90deg, var(--neon-blue-dim), var(--neon-red-dim));
+  border:1px solid var(--neon-blue);
+  color:var(--text-hi);
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:2px;
+  font-size:0.85rem;
+  text-transform:uppercase;
+  transition:transform .15s, box-shadow .15s;
+}
+.auth-submit:hover{ box-shadow:0 0 20px rgba(34,211,255,0.5); transform:translateY(-1px); }
+.auth-submit:active{ transform:translateY(0); }
+.auth-submit:disabled{ opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.auth-switch{
+  text-align:center;
+  margin-top:18px;
+  font-size:0.85rem;
+  color:var(--text-mid);
+}
+.auth-switch button{
+  background:none; border:none;
+  color:var(--neon-blue);
+  font-weight:600;
+  padding:0; margin-left:4px;
+}
+.auth-switch button:hover{ text-decoration:underline; }
+
+.auth-message{
+  min-height:20px;
+  text-align:center;
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  margin-bottom:14px;
+  letter-spacing:0.5px;
+}
+.auth-message.error{ color:var(--neon-red); }
+.auth-message.ok{ color:#3ee08a; }
+
+/* =========================================================
+   MAIN SITE / NAV
+   ========================================================= */
+#main-site{ min-height:100vh; position:relative; z-index:1; }
+
+.navbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  height:64px;
+  background:var(--bg-panel);
+  border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:50;
+}
+.brand{
+  font-family:var(--font-display);
+  font-weight:900;
+  font-size:1.15rem;
+  letter-spacing:1px;
+}
+.brand .bx{color:var(--neon-blue); text-shadow:0 0 8px var(--neon-blue);}
+.brand .bg{color:var(--neon-red); text-shadow:0 0 8px var(--neon-red);}
+
+.nav-links{ display:flex; align-items:center; gap:6px; list-style:none; }
+.nav-links > li{ position:relative; }
+.nav-links > li > a{
+  display:block;
+  padding:10px 14px;
+  font-size:0.85rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+  font-weight:600;
+  border-bottom:2px solid transparent;
+  transition:color .2s, border-color .2s;
+}
+.nav-links > li > a:hover,
+.nav-links > li > a:focus-visible{ color:var(--neon-blue); border-color:var(--neon-blue); }
+
+/* hamburger trigger — sits after XtremeAI with a visible gap, per spec */
+.hamburger-item{ margin-left:18px; }
+.hamburger-btn{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  width:38px;
+  height:38px;
+  background:transparent;
+  border:1px solid var(--line);
+  padding:0;
+  transition:border-color .2s, box-shadow .2s;
+}
+.hamburger-btn span{
+  display:block;
+  width:18px;
+  height:2px;
+  background:var(--neon-blue);
+  box-shadow:0 0 6px var(--neon-blue);
+  transition:transform .2s, opacity .2s;
+}
+.hamburger-btn:hover,
+.hamburger-item:focus-within .hamburger-btn{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 12px rgba(34,211,255,0.35);
+}
+.hamburger-item:hover .hamburger-btn span:nth-child(1),
+.hamburger-item:focus-within .hamburger-btn span:nth-child(1){ transform:translateY(1px) rotate(6deg); }
+.hamburger-item:hover .hamburger-btn span:nth-child(3),
+.hamburger-item:focus-within .hamburger-btn span:nth-child(3){ transform:translateY(-1px) rotate(-6deg); }
+
+.dropdown{
+  position:absolute;
+  top:100%; right:0;
+  min-width:220px;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-top:2px solid var(--neon-red);
+  display:none;
+  flex-direction:column;
+  padding:6px 0;
+  box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  z-index:60;
+}
+.hamburger-item:hover .dropdown,
+.hamburger-item:focus-within .dropdown{ display:flex; }
+.dropdown a{
+  padding:10px 16px;
+  font-size:0.82rem;
+  color:var(--text-mid);
+  letter-spacing:0.5px;
+}
+.dropdown a:hover{ color:var(--neon-blue); background:rgba(34,211,255,0.06); }
+
+.profile-chip{
+  display:flex; align-items:center; gap:10px;
+  padding:6px 12px 6px 6px;
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  position:relative;
+  cursor:pointer;
+  user-select:none;
+}
+.profile-chip:hover,
+.profile-chip.open{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 12px rgba(34,211,255,0.25);
+}
+.profile-chip img{
+  width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--neon-blue);
+  object-fit:cover;
+}
+.profile-chip span{ font-size:0.85rem; font-weight:600; }
+
+.profile-dropdown{
+  position:absolute;
+  top:calc(100% + 8px); right:0;
+  min-width:200px;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-top:2px solid var(--neon-blue);
+  display:none;
+  flex-direction:column;
+  padding:6px 0;
+  box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  z-index:70;
+}
+.profile-dropdown.open{ display:flex; }
+.profile-dropdown button{
+  background:none;
+  border:none;
+  text-align:left;
+  width:100%;
+  padding:10px 16px;
+  font-size:0.82rem;
+  font-family:var(--font-body);
+  letter-spacing:0.5px;
+  color:var(--text-mid);
+}
+.profile-dropdown button:hover{ color:var(--neon-blue); background:rgba(34,211,255,0.06); }
+.profile-dropdown button.logout-option{ color:var(--neon-red); }
+.profile-dropdown button.logout-option:hover{ color:var(--neon-red); background:rgba(255,45,85,0.08); }
+.profile-dropdown .divider{ height:1px; background:var(--line); margin:6px 0; }
+
+.hero{
+  padding:90px 28px;
+  text-align:center;
+  position:relative;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,11,0.55) 0%, rgba(5,5,11,0.75) 55%, rgba(5,5,11,1) 100%),
+    url("https://cdn.jsdelivr.net/gh/xtremetechprograms/TIERLIST-ICONS@main/XtremeGAngbg.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(2rem,6vw,3.4rem);
+  font-weight:900;
+  letter-spacing:1px;
+}
+.hero h1 .hx{color:var(--neon-blue); text-shadow:0 0 14px var(--neon-blue);}
+.hero h1 .hg{color:var(--neon-red); text-shadow:0 0 14px var(--neon-red);}
+.hero p{
+  margin-top:16px;
+  color:var(--text-mid);
+  font-size:1.05rem;
+  max-width:560px;
+  margin-left:auto; margin-right:auto;
+}
+.hero-actions{ margin-top:30px; display:flex; gap:14px; justify-content:center; }
+
+/* =========================================================
+   TAB SWITCHING (dashboard-style, one section visible at a time)
+   ========================================================= */
+.tab-section{ display:none; }
+.tab-section.active{ display:block; }
+
+.about-section{
+  padding:80px 28px 100px;
+}
+.about-inner{
+  max-width:960px;
+  margin:0 auto;
+  text-align:center;
+}
+.about-inner h2{
+  font-family:var(--font-display);
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  font-weight:900;
+  letter-spacing:1px;
+}
+.about-lede{
+  margin-top:14px;
+  color:var(--text-mid);
+  font-size:1.05rem;
+  max-width:560px;
+  margin-left:auto; margin-right:auto;
+}
+.about-founder-name{
+  margin-top:36px;
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--neon-blue);
+  text-shadow:0 0 12px rgba(34,211,255,0.5);
+}
+.about-grid{
+  margin-top:48px;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+  text-align:left;
+}
+@media (max-width:800px){
+  .about-grid{ grid-template-columns:1fr; }
+}
+.about-card{
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  padding:26px 22px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.about-card:hover{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 18px rgba(34,211,255,0.15);
+}
+.about-card h3{
+  font-family:var(--font-display);
+  font-size:0.95rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--neon-blue);
+  text-shadow:0 0 10px rgba(34,211,255,0.4);
+  margin-bottom:10px;
+}
+.about-card p{
+  color:var(--text-mid);
+  font-size:0.92rem;
+  line-height:1.55;
+}
+.about-actions{ margin-top:48px; display:flex; justify-content:center; }
+
+/* =========================================================
+   WORK LIBRARIES
+   ---------------------------------------------------------
+   Full-height background image behind the whole section.
+   Every member gets an auto-created library, shown as a
+   long row (avatar + "{name}'s Library"); clicking a row
+   expands that member's subject list underneath it.
+   ========================================================= */
+.libraries-section{
+  position:relative;
+  min-height:calc(100vh - 64px);
+  padding:0;
+  overflow:hidden;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,11,0.6) 0%, rgba(5,5,11,0.72) 55%, rgba(5,5,11,0.88) 100%),
+    url("https://static.vecteezy.com/system/resources/thumbnails/049/855/932/small/stunning-high-resolution-nature-and-landscape-backgrounds-breathtaking-scenery-in-hd-free-photo.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+/* Higher specificity than the base .tab-section.active{display:block}
+   rule so this tab gets flex centering ONLY while it's the active tab —
+   this is what keeps it from bleeding into every other tab. */
+.tab-section.libraries-section.active{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+@media (max-width:900px){
+  /* background-attachment:fixed is unreliable on mobile browsers */
+  .libraries-section{ background-attachment:scroll; }
+}
+
+.libraries-content{
+  width:100%;
+  max-width:640px;
+  margin:0 auto;
+  padding:80px 28px 100px;
+}
+
+.libraries-heading{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:clamp(1.6rem,4.5vw,2.2rem);
+  font-weight:900;
+  letter-spacing:1px;
+}
+.libraries-sub{
+  margin-top:10px;
+  text-align:center;
+  color:var(--text-mid);
+  font-size:0.95rem;
+}
+
+.libraries-search-row{
+  margin-top:26px;
+}
+.libraries-search-input{
+  width:100%;
+  padding:12px 16px;
+  background:rgba(12,12,22,0.75);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.95rem;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.libraries-search-input::placeholder{ color:var(--text-mid); }
+.libraries-search-input:focus{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 12px rgba(34,211,255,0.3);
+}
+
+.libraries-list{
+  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.libraries-loading, .libraries-empty-msg{
+  text-align:center;
+  color:var(--text-mid);
+  font-size:0.9rem;
+  padding:30px 16px;
+}
+
+.library-member{ width:100%; }
+
+.library-row{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:14px 22px;
+  background:rgba(10,10,18,0.6);
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s, background .2s;
+}
+.library-row:hover{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 18px rgba(34,211,255,0.2);
+}
+.library-row.open{
+  border-color:var(--neon-blue);
+  background:rgba(34,211,255,0.08);
+}
+
+.library-row-avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:2px solid var(--neon-blue);
+  box-shadow:0 0 10px rgba(34,211,255,0.3);
+  object-fit:cover;
+  flex-shrink:0;
+}
+.library-row-name{
+  flex:1;
+  text-align:left;
+  font-family:var(--font-display);
+  font-size:0.92rem;
+  letter-spacing:0.5px;
+  color:var(--text-hi);
+}
+.library-row-arrow{
+  color:var(--neon-blue);
+  font-size:0.9rem;
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.library-row.open .library-row-arrow{ transform:rotate(90deg); }
+
+.library-row-subjects{
+  margin-top:10px;
+  padding-left:14px;
+  border-left:2px solid rgba(34,211,255,0.35);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.library-row-subjects.hidden{ display:none; }
+
+.subject-btn{
+  width:100%;
+  padding:14px 22px;
+  background:rgba(10,10,18,0.6);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-display);
+  font-size:0.85rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s, background .2s, transform .2s;
+}
+.subject-btn:hover{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 16px rgba(34,211,255,0.25);
+  background:rgba(34,211,255,0.08);
+  transform:translateX(4px);
+}
+
+/* =========================================================
+   XTREMEAI CHAT
+   ---------------------------------------------------------
+   Full-bleed layout beneath the navbar: left sidebar for
+   New Chat + history, right pane for the conversation.
+   navbar height is 64px (see .navbar), so this fills the rest.
+   ========================================================= */
+.ai-section{
+  padding:0;
+  height:calc(100vh - 64px);
+  overflow:hidden;
+}
+.ai-layout{
+  display:flex;
+  height:100%;
+}
+
+/* --- Sidebar --- */
+.ai-sidebar{
+  width:260px;
+  flex-shrink:0;
+  background:var(--bg-panel);
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  padding:16px 12px;
+  overflow:hidden;
+}
+.ai-new-chat-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  padding:11px 14px;
+  border:1px solid var(--neon-blue);
+  background:transparent;
+  color:var(--neon-blue);
+  font-family:var(--font-display);
+  font-size:0.8rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  transition:box-shadow .2s;
+  flex-shrink:0;
+}
+.ai-new-chat-btn:hover{ box-shadow:0 0 14px rgba(34,211,255,0.35); }
+.ai-new-chat-btn .ai-plus{ font-size:1rem; font-weight:900; }
+
+.ai-history{
+  margin-top:16px;
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  overflow-y:auto;
+}
+.ai-history-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 10px;
+  font-size:0.82rem;
+  color:var(--text-mid);
+  border:1px solid transparent;
+  cursor:pointer;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ai-history-item:hover{ background:var(--bg-panel-2); color:var(--text-hi); }
+.ai-history-item.active{
+  background:var(--bg-panel-2);
+  border-color:var(--neon-blue);
+  color:var(--text-hi);
+}
+.ai-history-title{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+.ai-history-delete{
+  flex-shrink:0;
+  background:none; border:none;
+  color:var(--text-mid);
+  font-size:0.9rem;
+  line-height:1;
+  padding:2px 4px;
+}
+.ai-history-delete:hover{ color:var(--neon-red); }
+.ai-history-empty{
+  color:var(--text-mid);
+  font-size:0.78rem;
+  padding:10px;
+  opacity:0.6;
+}
+
+.ai-sidebar-profile{
+  flex-shrink:0;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.ai-sidebar-profile img{
+  width:34px; height:34px;
+  border-radius:50%;
+  border:1px solid var(--neon-blue);
+  object-fit:cover;
+  flex-shrink:0;
+}
+.ai-sidebar-profile span{
+  font-size:0.85rem;
+  font-weight:600;
+  color:var(--text-hi);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* --- Chat pane --- */
+.ai-chat-pane{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+.ai-messages{
+  flex:1;
+  overflow-y:auto;
+  padding:26px 8%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.ai-msg{
+  display:flex;
+  gap:10px;
+  max-width:75%;
+}
+.ai-msg-bot{ align-self:flex-start; }
+.ai-msg-user{ align-self:flex-end; flex-direction:row-reverse; }
+
+.ai-msg-avatar{
+  flex-shrink:0;
+  width:30px; height:30px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display);
+  font-size:0.7rem;
+  font-weight:700;
+  letter-spacing:0.5px;
+  overflow:hidden;
+}
+.ai-msg-avatar img{
+  width:100%; height:100%;
+  object-fit:cover;
+}
+.ai-msg-bot .ai-msg-avatar{
+  border:1px solid var(--neon-blue);
+  color:var(--neon-blue);
+  text-shadow:0 0 8px rgba(34,211,255,0.5);
+}
+.ai-msg-user .ai-msg-avatar{
+  border:1px solid var(--neon-red);
+  color:var(--neon-red);
+  text-shadow:0 0 8px rgba(255,45,85,0.5);
+}
+
+.ai-msg-bubble{
+  padding:10px 14px;
+  font-size:0.92rem;
+  line-height:1.5;
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  color:var(--text-hi);
+}
+.ai-msg-bot .ai-msg-bubble{ border-left:2px solid var(--neon-blue); }
+.ai-msg-user .ai-msg-bubble{ border-right:2px solid var(--neon-red); }
+.ai-msg-bubble img{
+  display:block;
+  max-width:220px;
+  margin-top:8px;
+  border:1px solid var(--line);
+}
+
+/* --- Input row --- */
+.ai-input-row{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  padding:16px 8%;
+  border-top:1px solid var(--line);
+  background:var(--bg-panel);
+}
+.ai-icon-btn{
+  flex-shrink:0;
+  width:46px; height:46px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  color:var(--text-mid);
+  font-size:1.4rem;
+  line-height:1;
+  transition:border-color .2s, color .2s;
+}
+.ai-icon-btn:hover{ border-color:var(--neon-blue); color:var(--neon-blue); }
+.ai-mic-btn.listening{
+  border-color:var(--neon-red);
+  color:var(--neon-red);
+  box-shadow:0 0 12px rgba(255,45,85,0.4);
+}
+
+.ai-input-wrap{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.ai-image-preview{ display:flex; gap:8px; flex-wrap:wrap; }
+.ai-image-preview:empty{ display:none; }
+.ai-image-chip{
+  position:relative;
+  width:56px; height:56px;
+  border:1px solid var(--neon-blue);
+  border-radius:10px;
+  overflow:hidden;
+}
+.ai-image-chip img{ width:100%; height:100%; object-fit:cover; }
+.ai-image-chip button{
+  position:absolute; top:0; right:0;
+  background:rgba(5,5,11,0.8);
+  color:var(--text-hi);
+  border:none;
+  width:16px; height:16px;
+  font-size:0.7rem;
+  line-height:1;
+}
+
+.ai-input{
+  width:100%;
+  height:46px;
+  padding:0 14px;
+  border-radius:12px;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.92rem;
+}
+.ai-input:focus{
+  outline:none;
+  border-color:var(--neon-blue);
+  box-shadow:0 0 10px rgba(34,211,255,0.25);
+}
+
+.ai-send-btn{
+  flex-shrink:0;
+  width:46px; height:46px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--neon-red);
+  background:var(--neon-red);
+  color:var(--bg-panel);
+  transition:box-shadow .2s, opacity .2s;
+}
+.ai-send-btn:hover{ box-shadow:0 0 14px rgba(255,45,85,0.5); }
+
+@media (max-width:760px){
+  .ai-sidebar{
+    position:fixed;
+    left:0; top:64px; bottom:0;
+    z-index:60;
+    transform:translateX(-100%);
+    transition:transform .2s ease;
+    box-shadow:0 0 30px rgba(0,0,0,0.6);
+  }
+  .ai-sidebar.open{ transform:translateX(0); }
+  .ai-messages, .ai-input-row{ padding-left:5%; padding-right:5%; }
+}
+
+/* =========================================================
+   RANKINGS
+   ========================================================= */
+.rankings-section{ padding:70px 28px 100px; }
+.rankings-inner{
+  max-width:520px;
+  margin:0 auto;
+}
+.rankings-title{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:clamp(1.5rem,4.5vw,2.1rem);
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:44px;
+}
+
+.rankings-block{
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  padding:26px 30px 30px;
+  margin-bottom:32px;
+}
+.rankings-heading{
+  font-family:var(--font-display);
+  font-size:1.15rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  text-decoration:underline;
+  margin-bottom:16px;
+}
+.rankings-heading-rainbow{
+  background:linear-gradient(90deg,#ff3b3b,#ffb03b,#3bff6e,#3bd1ff,#a13bff,#ff3bd1);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.rankings-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+.rankings-list li{
+  font-family:var(--font-display);
+  font-size:0.92rem;
+  letter-spacing:0.5px;
+  font-weight:700;
+}
+.rankings-holder{
+  margin-left:10px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:0.82rem;
+  color:var(--text-mid);
+}
+
+/* rank name colors, matched to the original list */
+.rk-red{ color:#ff4d4d; text-shadow:0 0 8px rgba(255,77,77,0.4); }
+.rk-orange{ color:#ff9d3b; text-shadow:0 0 8px rgba(255,157,59,0.4); }
+.rk-yellow{ color:#f5e14a; text-shadow:0 0 8px rgba(245,225,74,0.4); }
+.rk-purple{ color:#b34dff; text-shadow:0 0 8px rgba(179,77,255,0.4); }
+.rk-violet{ color:#8a5cff; text-shadow:0 0 8px rgba(138,92,255,0.4); }
+.rk-magenta{ color:#ff4dd8; text-shadow:0 0 8px rgba(255,77,216,0.4); }
+.rk-pink{ color:#ff6fb0; text-shadow:0 0 8px rgba(255,111,176,0.4); }
+.rk-lime{ color:#9dff4d; text-shadow:0 0 8px rgba(157,255,77,0.4); }
+.rk-green{ color:#4dff88; text-shadow:0 0 8px rgba(77,255,136,0.4); }
+.rk-blue{ color:#4d9dff; text-shadow:0 0 8px rgba(77,157,255,0.4); }
+.rk-cyan{ color:#4dfff2; text-shadow:0 0 8px rgba(77,255,242,0.4); }
+.rk-lightblue{ color:#7fc9ff; text-shadow:0 0 8px rgba(127,201,255,0.4); }
+.rk-gray{ color:#c7c7cf; }
+
+.detailed-rankings-btn{
+  display:block;
+  width:100%;
+  margin-top:8px;
+  padding:16px 22px;
+  border:1px solid var(--neon-blue);
+  background:var(--bg-panel-2);
+  color:var(--neon-blue);
+  font-family:var(--font-display);
+  font-size:0.9rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  text-align:center;
+  transition:box-shadow .2s, background .2s;
+}
+.detailed-rankings-btn:hover{
+  box-shadow:0 0 18px rgba(34,211,255,0.35);
+  background:var(--bg-panel);
+}
+
+/* --- modal --- */
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(5,5,11,0.75);
+  z-index:200;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal-overlay.open{ display:flex; }
+
+.modal-box{
+  position:relative;
+  width:100%;
+  max-width:480px;
+  max-height:85vh;
+  overflow-y:auto;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-top:2px solid var(--neon-red);
+  padding:34px 28px 30px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  transition:max-width .2s ease;
+}
+.modal-box.wide{ max-width:640px; }
+.modal-close{
+  position:absolute;
+  top:12px; right:14px;
+  background:none;
+  border:none;
+  color:var(--text-mid);
+  font-size:1.4rem;
+  line-height:1;
+}
+.modal-close:hover{ color:var(--neon-red); }
+
+.modal-title{
+  font-family:var(--font-display);
+  font-size:1.1rem;
+  letter-spacing:1px;
+  text-align:center;
+  margin-bottom:26px;
+}
+
+.modal-tier-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.modal-tier-btn{
+  padding:16px 12px;
+  border:1px solid var(--line);
+  background:var(--bg-panel);
+  font-family:var(--font-display);
+  font-size:0.82rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-hi);
+  transition:border-color .2s, box-shadow .2s, color .2s;
+}
+.modal-tier-btn.tier-normal:hover{ border-color:#9dff4d; color:#9dff4d; box-shadow:0 0 14px rgba(157,255,77,0.3); }
+.modal-tier-btn.tier-pro:hover{ border-color:var(--neon-blue); color:var(--neon-blue); box-shadow:0 0 14px rgba(34,211,255,0.3); }
+.modal-tier-btn.tier-premium:hover{ border-color:#b34dff; color:#b34dff; box-shadow:0 0 14px rgba(179,77,255,0.3); }
+.modal-tier-btn.tier-platinum:hover{ border-color:var(--neon-red); color:var(--neon-red); box-shadow:0 0 14px rgba(255,45,85,0.3); }
+
+.modal-tier-note{
+  margin-top:20px;
+  text-align:center;
+  font-size:0.85rem;
+  color:var(--text-mid);
+  min-height:1.2em;
+}
+
+/* --- subject photos modal --- */
+.sp-upload-row{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:24px;
+}
+.sp-upload-row.hidden{ display:none; }
+.sp-chapter-fields{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.sp-chapter-select, .sp-chapter-name-input{
+  padding:10px 12px;
+  background:var(--bg-panel-2, #12121f);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.9rem;
+  outline:none;
+}
+.sp-chapter-select{ flex:0 0 auto; min-width:110px; }
+.sp-chapter-name-input{ flex:1 1 180px; min-width:0; }
+.sp-chapter-select:focus, .sp-chapter-name-input:focus{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 10px rgba(34,211,255,0.25);
+}
+.sp-upload-action-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.sp-upload-status{
+  font-size:0.8rem;
+  color:var(--text-mid);
+}
+
+.sp-photo-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+@media (max-width:520px){
+  .sp-photo-grid{ grid-template-columns:repeat(2, 1fr); }
+}
+
+.sp-photo-item{
+  position:relative;
+  border:1px solid var(--line);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.sp-photo-item-img-wrap{
+  position:relative;
+  aspect-ratio:1;
+  overflow:hidden;
+  cursor:pointer;
+}
+.sp-photo-item img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.sp-photo-label{
+  padding:6px 8px;
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  color:var(--text-hi);
+  background:rgba(12,12,22,0.85);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.sp-photo-delete{
+  position:absolute;
+  top:6px; right:6px;
+  width:26px; height:26px;
+  border-radius:50%;
+  border:1px solid var(--neon-red);
+  background:rgba(5,5,11,0.75);
+  color:var(--neon-red);
+  font-size:1rem;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:box-shadow .2s, background .2s;
+}
+.sp-photo-delete:hover{
+  background:var(--neon-red);
+  color:#0a0a12;
+  box-shadow:0 0 12px rgba(255,45,85,0.5);
+}
+
+.sp-empty-msg{
+  text-align:center;
+  color:var(--text-mid);
+  font-size:0.9rem;
+  padding:30px 16px;
+}
+.sp-empty-msg.hidden{ display:none; }
+
+/* --- fullscreen photo lightbox --- */
+.lightbox-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:300; /* above .modal-overlay (200) */
+  background:rgba(2,2,6,0.96);
+  flex-direction:column;
+}
+.lightbox-overlay.open{ display:flex; }
+
+.lightbox-topbar{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+  gap:12px;
+}
+.lightbox-counter{
+  font-family:var(--font-mono);
+  font-size:0.8rem;
+  letter-spacing:1px;
+  color:var(--text-mid);
+}
+.lightbox-controls{ display:flex; align-items:center; gap:8px; }
+.lightbox-btn{
+  min-width:38px;
+  height:38px;
+  padding:0 10px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.04);
+  color:var(--text-hi);
+  font-family:var(--font-display);
+  font-size:1rem;
+  line-height:1;
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s, color .2s;
+}
+.lightbox-btn:hover{
+  border-color:var(--neon-blue);
+  color:var(--neon-blue);
+  box-shadow:0 0 10px rgba(34,211,255,0.3);
+}
+.lightbox-btn.lightbox-minimize:hover{
+  border-color:var(--neon-red);
+  color:var(--neon-red);
+  box-shadow:0 0 10px rgba(255,45,85,0.3);
+}
+
+.lightbox-stage{
+  flex:1;
+  position:relative;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+}
+.lightbox-slide{
+  height:100%;
+  width:100%;
+  scroll-snap-align:center;
+  scroll-snap-stop:always;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.lightbox-slide img{
+  max-width:92vw;
+  max-height:100%;
+  object-fit:contain;
+  will-change:transform;
+  transform-origin:center center;
+  user-select:none;
+  touch-action:none; /* this image handles its own pinch/pan; the slide/stage handles vertical scroll */
+}
+.lightbox-slide img.animated{ transition:transform .18s ease; }
+.lightbox-slide.zoomed{ cursor:grab; }
+.lightbox-slide.zoomed.dragging{ cursor:grabbing; }
+
+.lightbox-hint{
+  flex-shrink:0;
+  text-align:center;
+  padding:10px 16px 16px;
+  font-size:0.75rem;
+  color:var(--text-low);
+}
+@media (max-width:640px){
+  .lightbox-hint{ display:none; }
+}
+
+/* --- modal detail view (per-tier rank breakdown) --- */
+.modal-detail-view.hidden,
+#modal-tier-select-view.hidden{ display:none; }
+
+.modal-back-btn{
+  background:none;
+  border:none;
+  color:var(--neon-blue);
+  font-family:var(--font-display);
+  font-size:0.8rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+  padding:0;
+}
+.modal-back-btn:hover{ text-shadow:0 0 10px rgba(34,211,255,0.5); }
+
+.modal-detail-content{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.modal-subheading{
+  margin-top:18px;
+  margin-bottom:4px;
+  font-family:var(--font-display);
+  font-size:0.85rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--neon-red);
+  border-bottom:1px solid var(--line);
+  padding-bottom:6px;
+}
+.modal-subheading:first-child{ margin-top:0; }
+
+.rank-row{
+  border:1px solid var(--line);
+  background:var(--bg-panel);
+  padding:10px 14px;
+}
+.rank-row-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.rank-row-name{
+  font-family:var(--font-display);
+  font-size:0.88rem;
+  letter-spacing:0.5px;
+  color:var(--text-hi);
+}
+.rank-row-points{
+  font-size:0.78rem;
+  color:var(--neon-blue);
+  font-weight:700;
+  white-space:nowrap;
+}
+.rank-row-special{
+  margin-top:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.rank-row-chip{
+  font-size:0.7rem;
+  padding:3px 8px;
+  border:1px solid var(--line);
+  color:var(--text-mid);
+  white-space:nowrap;
+}
+.rank-row-advancements{
+  margin-top:8px;
+  padding-left:16px;
+  font-size:0.78rem;
+  color:var(--text-mid);
+  line-height:1.5;
+}
+.rank-row-advancements li{ list-style:disc; }
+
+/* =========================================================
+   LEADERBOARD
+   ========================================================= */
+.leaderboard-section{ padding:70px 28px 100px; }
+.leaderboard-inner{
+  max-width:760px;
+  margin:0 auto;
+}
+.leaderboard-title{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:36px;
+}
+
+.leaderboard-box{
+  background:#000;
+  border:1px solid var(--line);
+  border-top:2px solid var(--neon-blue);
+  overflow:hidden;
+}
+.leaderboard-head-row,
+.leaderboard-row{
+  display:grid;
+  grid-template-columns:70px 56px 1fr 1.4fr 90px;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+}
+.leaderboard-head-row{
+  font-family:var(--font-display);
+  font-size:0.72rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+  border-bottom:1px solid var(--line);
+}
+.leaderboard-rows{
+  display:flex;
+  flex-direction:column;
+}
+.leaderboard-row{
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  cursor:pointer;
+  transition:background .15s;
+}
+.leaderboard-row:last-child{ border-bottom:none; }
+.leaderboard-row:hover{ background:rgba(34,211,255,0.06); }
+
+.lb-col-division{
+  font-family:var(--font-display);
+  font-size:0.85rem;
+  color:var(--text-mid);
+}
+.lb-col-image img{
+  width:32px; height:32px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--line);
+}
+.lb-col-rank{
+  font-family:var(--font-display);
+  font-size:0.78rem;
+  letter-spacing:0.5px;
+}
+.lb-col-username{
+  font-size:0.88rem;
+  color:var(--text-hi);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.lb-col-points{
+  font-family:var(--font-display);
+  font-size:0.85rem;
+  color:var(--neon-blue);
+  text-align:right;
+}
+
+.leaderboard-empty{
+  padding:30px 16px;
+  text-align:center;
+  color:var(--text-mid);
+  font-size:0.85rem;
+}
+
+@media (max-width:640px){
+  .leaderboard-head-row, .leaderboard-row{
+    grid-template-columns:44px 40px 1fr 1fr 70px;
+    padding:10px 10px;
+    font-size:0.8rem;
+  }
+}
+
+/* --- member detail panel (reuses .modal-overlay/.modal-box) --- */
+.lb-member-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:22px;
+}
+.lb-member-header img{
+  width:56px; height:56px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--neon-blue);
+}
+.lb-member-username{
+  font-family:var(--font-display);
+  font-size:1.05rem;
+  color:var(--text-hi);
+}
+.lb-member-rank{
+  margin-top:4px;
+  font-size:0.8rem;
+  letter-spacing:0.5px;
+}
+.lb-member-points{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.lb-member-points .rank-row-chip{ font-size:0.75rem; }
+
+/* =========================================================
+   PERSONAL PANEL
+   ---------------------------------------------------------
+   Read-only account overview — distinct from Edit Profile
+   (which is the editing form, opened separately via the
+   profile chip dropdown).
+   ========================================================= */
+.personal-panel-section{ padding:80px 28px 100px; }
+.personal-panel-inner{
+  max-width:520px;
+  margin:0 auto;
+}
+.personal-panel-title{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:clamp(1.6rem,4.5vw,2.2rem);
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:36px;
+}
+.pp-card{
+  border:1px solid var(--line);
+  background:var(--bg-panel-2);
+  padding:32px 28px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:6px;
+}
+.pp-avatar{
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  border:2px solid var(--neon-blue);
+  box-shadow:0 0 16px rgba(34,211,255,0.3);
+  object-fit:cover;
+  margin-bottom:14px;
+}
+.pp-name{
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  letter-spacing:0.5px;
+  color:var(--text-hi);
+}
+.pp-email{
+  font-size:0.85rem;
+  color:var(--text-mid);
+}
+.pp-stats{
+  margin-top:22px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  width:100%;
+}
+.pp-stat{
+  border:1px solid var(--line);
+  padding:14px 10px;
+}
+.pp-stat-label{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-low);
+}
+.pp-stat-value{
+  margin-top:4px;
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  color:var(--neon-blue);
+  text-shadow:0 0 10px rgba(34,211,255,0.4);
+}
+.pp-actions{
+  margin-top:28px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* =========================================================
+   PERSONAL PANEL — OWNER-ONLY MEMBER MANAGEMENT
+   Only shown when the logged-in account's username is
+   OWNER_USERNAME (set in the script below).
+   ========================================================= */
+.pp-admin-block{
+  margin-top:20px;
+  align-items:stretch;
+  text-align:left;
+}
+.pp-admin-title{
+  font-family:var(--font-display);
+  font-size:0.95rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--neon-blue);
+  text-align:center;
+  margin-bottom:18px;
+}
+.pp-admin-form .ep-label{ margin:14px 0 6px; }
+.pp-admin-form .ep-label:first-of-type{ margin-top:0; }
+.pp-admin-list{ list-style:none; }
+.pp-admin-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+.pp-admin-row:last-child{ border-bottom:none; }
+.pp-admin-row-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.pp-admin-username{
+  font-family:var(--font-display);
+  font-size:0.88rem;
+  letter-spacing:0.5px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pp-admin-email{
+  font-family:var(--font-mono);
+  font-size:0.7rem;
+  color:var(--text-mid);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pp-admin-empty{
+  color:var(--text-low);
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  text-align:center;
+  padding:6px 0;
+}
+.pp-admin-row-actions{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.pp-admin-delete{
+  padding:8px 14px;
+  border:1px solid var(--neon-red);
+  color:#fff;
+  background:var(--neon-red-dim);
+  font-family:var(--font-display);
+  font-size:0.68rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  flex-shrink:0;
+  transition:box-shadow .2s;
+}
+.pp-admin-delete:hover{ box-shadow:0 0 14px rgba(255,45,85,0.5); }
+.pp-admin-note{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  color:var(--text-low);
+  line-height:1.6;
+  margin-top:18px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+}
+
+/* =========================================================
+   EDIT PROFILE
+   ========================================================= */
+.edit-profile-section{ padding:70px 28px 100px; }
+.edit-profile-inner{
+  max-width:520px;
+  margin:0 auto;
+}
+.edit-profile-title{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:clamp(1.6rem,4.5vw,2.2rem);
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:36px;
+}
+
+.ep-avatar-row{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  margin-bottom:30px;
+}
+.ep-avatar-row img{
+  width:80px; height:80px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--neon-blue);
+  flex-shrink:0;
+}
+.ep-avatar-actions{ display:flex; flex-direction:column; gap:8px; }
+.ep-avatar-hint{ font-size:0.75rem; color:var(--text-mid); }
+
+.ep-label{
+  display:block;
+  margin:20px 0 8px;
+  font-family:var(--font-display);
+  font-size:0.78rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+}
+.ep-input{
+  width:100%;
+  padding:12px 14px;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.92rem;
+}
+.ep-input:focus{
+  outline:none;
+  border-color:var(--neon-blue);
+  box-shadow:0 0 10px rgba(34,211,255,0.25);
+}
+.ep-textarea{ resize:vertical; min-height:90px; }
+.ep-char-count{
+  text-align:right;
+  font-size:0.72rem;
+  color:var(--text-mid);
+  margin-top:4px;
+}
+
+.ep-status{
+  min-height:1.2em;
+  margin-top:16px;
+  font-size:0.85rem;
+  text-align:center;
+}
+.ep-status.success{ color:#4dff88; }
+.ep-status.error{ color:var(--neon-red); }
+
+.ep-actions{
+  margin-top:24px;
+  display:flex;
+  gap:14px;
+  justify-content:center;
+}
+
+
+.btn-ghost{
+  padding:12px 22px;
+  border:1px solid var(--neon-blue);
+  color:var(--neon-blue);
+  font-family:var(--font-display);
+  font-size:0.8rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  background:transparent;
+  transition:box-shadow .2s;
+}
+.btn-ghost:hover{ box-shadow:0 0 18px rgba(34,211,255,0.5); }
+.btn-solid{
+  padding:12px 22px;
+  border:1px solid var(--neon-red);
+  color:#fff;
+  background:var(--neon-red-dim);
+  font-family:var(--font-display);
+  font-size:0.8rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  transition:box-shadow .2s;
+}
+.btn-solid:hover{ box-shadow:0 0 18px rgba(255,45,85,0.5); }
+
+@media (max-width:900px){
+  .nav-links{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     INTRO / STARTUP ANIMATION
+     ============================================================ -->
+<div id="intro-screen">
+  <div class="intro-stage">
+    <div class="word1" id="word1">
+      <span class="x-letter" id="x-letter">X</span>
+      <span class="chain-wrap" id="chain-wrap">
+        <span class="chain-link left" id="chain-left"></span>
+        <span class="chain-link right" id="chain-right"></span>
+        treme
+      </span>
+      <span class="gang-letter" id="gang-letter">Gang</span>
+    </div>
+  </div>
+
+  <div class="word2" id="word2">
+    <span class="by-word" id="by-word">By</span>
+    <span class="author-word" id="author-word">SaumyaXtreme</span>
+  </div>
+
+  <div class="tip-line" id="tip-line"></div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOGIN / REGISTER
+     ============================================================ -->
+<div id="auth-screen" class="hidden">
+  <div class="auth-box">
+
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+      <h1 class="auth-heading"><span class="hx">Xtreme</span><span class="hg">Gang</span></h1>
+      <p class="auth-sub">Member Login</p>
+      <p class="auth-message" id="login-message"></p>
+
+      <div class="field">
+        <label for="login-username">Username</label>
+        <input id="login-username" type="text" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" autocomplete="current-password" required>
+      </div>
+
+      <div class="field">
+        <label for="login-captcha">Captcha</label>
+        <div class="captcha-row">
+          <canvas id="captcha-canvas" width="130" height="42"></canvas>
+          <button type="button" class="captcha-refresh" id="captcha-refresh" title="New captcha" aria-label="Generate new captcha">&#8635;</button>
+          <input id="login-captcha" type="text" placeholder="Enter code" required style="flex:1;">
+        </div>
+      </div>
+
+      <button type="submit" class="auth-submit" id="login-submit">Enter</button>
+
+      <p class="auth-switch">Membership is by invite only.<br>Contact an admin to get an account.</p>
+    </form>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN SITE
+     ============================================================ -->
+<div id="main-site" class="hidden">
+  <nav class="navbar">
+    <div class="brand"><span class="bx">Xtreme</span><span class="bg">Gang</span></div>
+
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About us</a></li>
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#xtremeai">XtremeAI</a></li>
+      <li class="hamburger-item" tabindex="0">
+        <button class="hamburger-btn" aria-label="Open menu" aria-haspopup="true">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="dropdown">
+          <a href="#rules">Rules and Regulations</a>
+          <a href="#terms">Terms and conditions</a>
+          <a href="#libraries">Work Libraries</a>
+          <a href="#leaderboard">Leaderboard</a>
+          <a href="#points">Pointings System</a>
+          <a href="#rankings">Rankings</a>
+          <a href="#payment">Payment App</a>
+          <a href="#bank">Bank Account</a>
+          <a href="#personal-panel">Personal Panel</a>
+          <a href="#chats">XtremeChats</a>
+        </div>
+      </li>
+    </ul>
+
+    <div class="profile-chip" id="profile-chip" tabindex="0">
+      <img id="profile-pic" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
+      <span id="profile-name">Guest</span>
+
+      <div class="profile-dropdown" id="profile-dropdown">
+        <button type="button" id="edit-profile-btn">Edit profile</button>
+        <button type="button" id="points-btn">Points</button>
+        <div class="divider"></div>
+        <button type="button" class="logout-option" id="logout-btn">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero tab-section active" id="home">
+    <h1><span class="hx">Xtreme</span><span class="hg">Gang</span></h1>
+    <p>Dominate the fields together. Earn points, climb the rankings, and let XtremeAI handle whatever's holding you up.</p>
+    <div class="hero-actions">
+      <button class="btn-ghost" onclick="location.hash='#leaderboard'">View Leaderboard</button>
+      <button class="btn-solid" onclick="location.hash='#rules'">Rules</button>
+    </div>
+  </section>
+
+  <section class="tab-section about-section" id="about">
+    <div class="about-inner">
+      <h2><span class="hx">About</span> <span class="hg">Us</span></h2>
+      <p class="about-lede">XtremeGang is a team made by SaumyaXtreme which focuses on working together, crossing limitations with unity, and making sure no one is left behind. Today you focus, tomorrow you enjoy.</p>
+
+      <h3 class="about-founder-name">SaumyaXtreme</h3>
+      <p class="about-lede">SaumyaXtreme is the official founder of XtremeGang, and he is also a Python and website developer. The website of XtremeGang was made by him.</p>
+
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>Who we are</h3>
+          <p>A crew of players and creators grinding toward the same goal — climbing the ranks, sharpening skills, and backing each other up along the way.</p>
+        </div>
+        <div class="about-card">
+          <h3>What we do</h3>
+          <p>From tracked points and leaderboards to shared tools and an AI assistant on standby, everything here exists to make progress easier to see and easier to earn.</p>
+        </div>
+        <div class="about-card">
+          <h3>Why it matters</h3>
+          <p>Solo grinding gets old fast. XtremeGang turns it into something you show up for — a place where effort actually gets recognized.</p>
+        </div>
+      </div>
+
+      <div class="about-actions">
+        <button class="btn-solid" onclick="location.hash='#home'">Back to Home</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab-section libraries-section" id="libraries">
+    <div class="libraries-content">
+      <h2 class="libraries-heading"><span class="hx">Work</span> <span class="hg">Libraries</span></h2>
+      <p class="libraries-sub">Every member gets their own library, auto-created the moment they join.</p>
+
+      <div class="libraries-search-row">
+        <input type="text" id="libraries-search" class="libraries-search-input" placeholder="Search libraries by name..." autocomplete="off">
+      </div>
+
+      <div class="libraries-list" id="libraries-list">
+        <p class="libraries-loading" id="libraries-loading">Loading libraries…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab-section ai-section" id="xtremeai">
+    <div class="ai-layout">
+
+      <!-- LEFT SIDEBAR: new chat + history -->
+      <aside class="ai-sidebar">
+        <button type="button" class="ai-new-chat-btn" id="ai-new-chat-btn">
+          <span class="ai-plus">+</span> New Chat
+        </button>
+        <div class="ai-history" id="ai-history">
+          <!-- chat history items injected by JS -->
+        </div>
+
+        <div class="ai-sidebar-profile" id="ai-sidebar-profile">
+          <img id="ai-sidebar-pic" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
+          <span id="ai-sidebar-id">Guest</span>
+        </div>
+      </aside>
+
+      <!-- RIGHT: chat area -->
+      <div class="ai-chat-pane">
+        <div class="ai-messages" id="ai-messages">
+          <div class="ai-msg ai-msg-bot">
+            <div class="ai-msg-avatar">X</div>
+            <div class="ai-msg-bubble">Hey! I'm XtremeAI. Ask me anything to get started.</div>
+          </div>
+        </div>
+
+        <form class="ai-input-row" id="ai-input-form">
+          <input type="file" id="ai-image-input" accept="image/*" hidden>
+          <button type="button" class="ai-icon-btn" id="ai-attach-btn" title="Upload image" aria-label="Upload image">+</button>
+
+          <div class="ai-input-wrap">
+            <div class="ai-image-preview" id="ai-image-preview"></div>
+            <input type="text" id="ai-input" class="ai-input" placeholder="Message XtremeAI..." autocomplete="off">
+          </div>
+
+          <button type="button" class="ai-icon-btn ai-mic-btn" id="ai-mic-btn" title="Voice input" aria-label="Voice input">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+
+          <button type="submit" class="ai-send-btn" id="ai-send-btn" title="Send" aria-label="Send">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="tab-section rankings-section" id="rankings">
+    <div class="rankings-inner">
+
+      <h2 class="rankings-title">
+        <span class="hx">Xtreme</span><span class="hg">Gang</span> Ranks
+      </h2>
+
+      <div class="rankings-block">
+        <h3 class="rankings-heading">
+          <span class="rk-red">Staff</span> <span class="rk-green">RANKS</span>
+        </h3>
+        <ul class="rankings-list">
+          <li class="rk-red">Owner</li>
+          <li class="rk-orange">Co-Owner</li>
+          <li class="rk-red">Advisor</li>
+          <li class="rk-yellow">HDS</li>
+          <li class="rk-purple">Glarient</li>
+          <li class="rk-magenta">Jr. Glarient</li>
+          <li class="rk-red">Senior Admin</li>
+          <li class="rk-red">Admin</li>
+          <li class="rk-violet">Sr. Moderator</li>
+          <li class="rk-purple">Moderator</li>
+          <li class="rk-pink">Jr. Moderator</li>
+          <li class="rk-lime">Sr. Helper</li>
+          <li class="rk-green">Helper</li>
+          <li class="rk-green">Jr. Helper</li>
+        </ul>
+      </div>
+
+      <div class="rankings-block">
+        <h3 class="rankings-heading rankings-heading-rainbow">RANKS</h3>
+        <ul class="rankings-list">
+          <li class="rk-blue">Tank</li>
+          <li class="rk-magenta">Priest</li>
+          <li class="rk-orange">Dragon</li>
+          <li class="rk-pink">Media</li>
+          <li class="rk-cyan">Divine</li>
+          <li class="rk-lime">Ultra</li>
+          <li class="rk-lightblue">Hero</li>
+          <li class="rk-gray">Member</li>
+        </ul>
+      </div>
+
+      <button type="button" class="detailed-rankings-btn" id="detailed-rankings-btn">
+        XtremeGang Detailed Rankings
+      </button>
+
+    </div>
+  </section>
+
+  <section class="tab-section leaderboard-section" id="leaderboard">
+    <div class="leaderboard-inner">
+      <h2 class="leaderboard-title">
+        <span class="hx">Leader</span><span class="hg">board</span>
+      </h2>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-head-row">
+          <span class="lb-col lb-col-division">Division</span>
+          <span class="lb-col lb-col-image">Image</span>
+          <span class="lb-col lb-col-rank">Rank</span>
+          <span class="lb-col lb-col-username">Username</span>
+          <span class="lb-col lb-col-points">Points</span>
+        </div>
+        <div class="leaderboard-rows" id="leaderboard-rows">
+          <!-- rows injected by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab-section personal-panel-section" id="personal-panel">
+    <div class="personal-panel-inner">
+      <h2 class="personal-panel-title"><span class="hx">Personal</span> <span class="hg">Panel</span></h2>
+
+      <div class="pp-card">
+        <img class="pp-avatar" id="pp-avatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
+        <div class="pp-name" id="pp-name">Guest</div>
+        <div class="pp-email" id="pp-email"></div>
+
+        <div class="pp-stats">
+          <div class="pp-stat">
+            <div class="pp-stat-label">Rank</div>
+            <div class="pp-stat-value" id="pp-rank">—</div>
+          </div>
+          <div class="pp-stat">
+            <div class="pp-stat-label">Points</div>
+            <div class="pp-stat-value" id="pp-points">—</div>
+          </div>
+        </div>
+
+        <div class="pp-actions">
+          <button type="button" class="btn-ghost" onclick="location.hash='#panel'">Edit Profile</button>
+          <button type="button" class="btn-solid" onclick="location.hash='#leaderboard'">View Leaderboard</button>
+        </div>
+      </div>
+
+      <!-- OWNER-ONLY: shown only when the logged-in username is
+           SaumyaXtreme (see OWNER_USERNAME in the script) -->
+      <div class="pp-card pp-admin-block hidden" id="pp-admin-block">
+        <h3 class="pp-admin-title">Add Member</h3>
+        <form id="pp-add-member-form" class="pp-admin-form">
+          <p class="ep-status" id="pp-add-message"></p>
+
+          <label class="ep-label" for="pam-username">Username</label>
+          <input type="text" id="pam-username" class="ep-input" required minlength="3" maxlength="20">
+
+          <label class="ep-label" for="pam-email">Email</label>
+          <input type="email" id="pam-email" class="ep-input" required>
+
+          <label class="ep-label" for="pam-password">Temporary Password</label>
+          <input type="text" id="pam-password" class="ep-input" required minlength="6">
+
+          <div class="ep-actions">
+            <button type="submit" class="btn-solid" id="pam-submit">Add Member</button>
+          </div>
+        </form>
+
+        <h3 class="pp-admin-title" style="margin-top:32px;">Members</h3>
+        <p class="ep-status" id="pp-member-list-message"></p>
+        <ul class="pp-admin-list" id="pp-member-list"></ul>
+
+        <p class="pp-admin-note">
+          Deleting a member removes their usernames doc, which the
+          Libraries page listens to live — their library box disappears
+          immediately, and they can no longer log in. Their old Firebase
+          Authentication record itself isn't permanently erased, since
+          that needs a privileged Admin SDK key that can't safely live
+          in a browser-side page — but everything visible and every
+          login path is fully cut off.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab-section edit-profile-section" id="panel">
+    <div class="edit-profile-inner">
+      <h2 class="edit-profile-title">
+        <span class="hx">Edit</span> <span class="hg">Profile</span>
+      </h2>
+
+      <form id="edit-profile-form">
+        <div class="ep-avatar-row">
+          <img id="ep-avatar-preview" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="">
+          <div class="ep-avatar-actions">
+            <input type="file" id="ep-avatar-input" accept="image/*" hidden>
+            <button type="button" class="btn-ghost" id="ep-avatar-btn">Change Image</button>
+            <p class="ep-avatar-hint">Square images work best. Auto-resized before saving.</p>
+          </div>
+        </div>
+
+        <label class="ep-label" for="ep-username">Chat Name</label>
+        <input type="text" id="ep-username" class="ep-input" maxlength="32" placeholder="Your display name" required>
+
+        <label class="ep-label" for="ep-bio">Description</label>
+        <textarea id="ep-bio" class="ep-input ep-textarea" maxlength="200" placeholder="Tell people a bit about yourself..."></textarea>
+        <p class="ep-char-count"><span id="ep-bio-count">0</span>/200</p>
+
+        <p class="ep-status" id="ep-status"></p>
+
+        <div class="ep-actions">
+          <button type="button" class="btn-ghost" onclick="location.hash='#home'">Cancel</button>
+          <button type="submit" class="btn-solid" id="ep-save-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD MEMBER PANEL -->
+  <div class="modal-overlay" id="lb-member-overlay">
+    <div class="modal-box" id="lb-member-box">
+      <button type="button" class="modal-close" id="lb-member-close" aria-label="Close">&times;</button>
+      <div class="lb-member-header">
+        <img id="lb-member-pic" src="" alt="">
+        <div>
+          <div class="lb-member-username" id="lb-member-username"></div>
+          <div class="lb-member-rank" id="lb-member-rank"></div>
+        </div>
+      </div>
+      <div class="lb-member-points" id="lb-member-points"></div>
+    </div>
+  </div>
+
+  <!-- SUBJECT PHOTOS MODAL -->
+  <div class="modal-overlay" id="subject-photos-overlay">
+    <div class="modal-box wide" id="subject-photos-box">
+      <button type="button" class="modal-close" id="subject-photos-close" aria-label="Close">&times;</button>
+      <h3 class="modal-title" id="subject-photos-title"></h3>
+
+      <div class="sp-upload-row hidden" id="sp-upload-row">
+        <div class="sp-chapter-fields">
+          <select id="sp-chapter-number" class="sp-chapter-select">
+            <option value="">Chapter #</option>
+          </select>
+          <input type="text" id="sp-chapter-name" class="sp-chapter-name-input" placeholder="Chapter name" maxlength="60">
+        </div>
+        <div class="sp-upload-action-row">
+          <input type="file" id="sp-photo-input" accept="image/*" hidden>
+          <button type="button" class="btn-ghost" id="sp-upload-btn">Add Chapter File</button>
+          <span class="sp-upload-status" id="sp-upload-status"></span>
+        </div>
+      </div>
+
+      <div class="sp-photo-grid" id="sp-photo-grid">
+        <!-- photo thumbnails injected by JS -->
+      </div>
+      <p class="sp-empty-msg hidden" id="sp-empty-msg">No photos here yet.</p>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN PHOTO LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <div class="lightbox-topbar">
+      <span class="lightbox-counter" id="lightbox-counter"></span>
+      <div class="lightbox-controls">
+        <button type="button" class="lightbox-btn" id="lightbox-zoom-out" aria-label="Zoom out">−</button>
+        <button type="button" class="lightbox-btn" id="lightbox-zoom-reset" aria-label="Reset zoom">1:1</button>
+        <button type="button" class="lightbox-btn" id="lightbox-zoom-in" aria-label="Zoom in">+</button>
+        <button type="button" class="lightbox-btn lightbox-minimize" id="lightbox-close" aria-label="Minimize">&times;</button>
+      </div>
+    </div>
+
+    <div class="lightbox-stage" id="lightbox-stage">
+      <!-- one .lightbox-slide per photo, injected by JS — scroll/swipe
+           moves continuously between them like a normal feed -->
+    </div>
+
+    <p class="lightbox-hint">Scroll or swipe to move between photos · double-tap to zoom</p>
+  </div>
+
+  <!-- DETAILED RANKINGS MODAL -->
+  <div class="modal-overlay" id="detailed-rankings-overlay">
+    <div class="modal-box" id="modal-box">
+      <button type="button" class="modal-close" id="detailed-rankings-close" aria-label="Close">&times;</button>
+
+      <div id="modal-tier-select-view">
+        <h3 class="modal-title">XtremeGang Detailed Rankings</h3>
+        <div class="modal-tier-grid">
+          <button type="button" class="modal-tier-btn tier-normal" data-tier="normal">Normal Ranks</button>
+          <button type="button" class="modal-tier-btn tier-pro" data-tier="pro">Pro Ranks</button>
+          <button type="button" class="modal-tier-btn tier-premium" data-tier="premium">Premium Ranks</button>
+          <button type="button" class="modal-tier-btn tier-platinum" data-tier="platinum">Platinum Ranks</button>
+        </div>
+        <p class="modal-tier-note" id="modal-tier-note"></p>
+      </div>
+
+      <div id="modal-tier-detail-view" class="modal-detail-view hidden">
+        <button type="button" class="modal-back-btn" id="modal-back-btn">&larr; Back</button>
+        <h3 class="modal-title" id="modal-detail-title"></h3>
+        <div class="modal-detail-content" id="modal-detail-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   FIREBASE SETUP
+   ---------------------------------------------------------
+   Replace this with the config object from your Firebase
+   project console: Project settings → General → Your apps.
+   ========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyD-u50ij6h1s9e0cg3K89fdVjR44gL_df0",
+  authDomain: "xtremegang-e3f2b.firebaseapp.com",
+  projectId: "xtremegang-e3f2b",
+  storageBucket: "xtremegang-e3f2b.firebasestorage.app",
+  messagingSenderId: "368252832811",
+  appId: "1:368252832811:web:3d52d418b0517ed4eb6e6e",
+  measurementId: "G-69PL7NNCRK"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* =========================================================
+   OWNER ACCOUNT
+   ---------------------------------------------------------
+   Public sign-up is gone. The only way to become a member is
+   for the site owner to add you from the Personal Panel below.
+   Usernames are unique (claimed inside a Firestore transaction
+   when an account is created), so at most one account can ever
+   be named "SaumyaXtreme" — checking the logged-in user's
+   display name against it is a safe, simple way to show the
+   "Add Member" tools to that one account only.
+   ========================================================= */
+const OWNER_USERNAME = "SaumyaXtreme";
+
+// Secondary app instance used ONLY for creating new member
+// accounts. Firebase Auth's client SDK automatically signs in as
+// whatever account it just created, which would otherwise kick
+// the owner out of their own session — routing account creation
+// through a second, independent app instance avoids that.
+const memberCreatorApp = firebase.initializeApp(firebaseConfig, "MemberCreator");
+const memberCreatorAuth = memberCreatorApp.auth();
+// Firestore instance tied to that same secondary app. The username
+// claim below has to be written through THIS instance, not the main
+// `db` — the security rules only allow a usernames/{id} doc to be
+// created by the same uid the doc names, and after account creation
+// it's memberCreatorAuth (not the owner's session) that's signed in
+// as that uid.
+const memberCreatorDb = memberCreatorApp.firestore();
+
+// On file:// pages (opening the HTML directly instead of via a real
+// server) the browser can restrict IndexedDB, which is what LOCAL
+// persistence relies on — this falls back to SESSION so auth calls
+// still resolve instead of hanging indefinitely.
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {
+  return auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+});
+
+// wraps a promise so it rejects after `ms` instead of hanging forever
+function withTimeout(promise, ms, timeoutMessage){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(timeoutMessage)), ms))
+  ]);
+}
+
+/* Firestore layout:
+   usernames/{usernameLowercase}  -> { uid, email, createdAt }
+   Registration is only allowed to succeed when this document
+   does not already exist, which is how "one username cannot
+   be registered again" is enforced. The write happens inside
+   a transaction so two simultaneous signups can't both win.
+*/
+
+/* =========================================================
+   INTRO ANIMATION SEQUENCE
+   ========================================================= */
+const TIP_POOL = [
+  "Lets dominate the fields together and tell who is better.",
+  "You can earn disciplinary points for being in discipline more than 2 days.",
+  "Do you know? There also exist helping points!",
+  "Normal Users gets 2 points/day increasing plans is better opinion.",
+  "We also provides you loan upto 200 points as limit!",
+  "Ranks in our team is decided by our points.",
+  "Aw! Is your work incomplete dont worry you can check Libraries of people!",
+  "Dont foget to read rules and regulations for better choices.",
+  "Read more about XtremeGang on about us page.",
+  "Lets go! We are having events to earn points and money!",
+  "You know what you can talk to members in chat section.",
+  "Bro having problem? Ask your personal helper friend XtremeAI!",
+  "XtremeAI is made for solving complex problems.",
+  "XtremeGang's founder is SaumyaXtreme.",
+  "Find a bug? Tell us in our chat we'll try to fix it soon as possible.",
+  "Are you bored of studying then play chat hames with XtremeAI!"
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function runIntro(){
+  const xLetter = document.getElementById('x-letter');
+  const chainWrap = document.getElementById('chain-wrap');
+  const chainLeft = document.getElementById('chain-left');
+  const chainRight = document.getElementById('chain-right');
+  const gangLetter = document.getElementById('gang-letter');
+  const word2 = document.getElementById('word2');
+  const byWord = document.getElementById('by-word');
+  const authorWord = document.getElementById('author-word');
+  const tipLine = document.getElementById('tip-line');
+  const progressFill = document.getElementById('progress-fill');
+
+  const TOTAL_MS = 9500; // full run before the bar is "complete"
+
+  // progress bar fills smoothly across the whole sequence
+  progressFill.style.transitionDuration = TOTAL_MS + 'ms';
+  requestAnimationFrame(() => { progressFill.style.width = '100%'; });
+
+  // 1. X slides in (0 - 0.5s)
+  xLetter.classList.add('run');
+
+  // 2. chain drops holding "treme", then snaps and retracts (1.0 - 2.5s)
+  setTimeout(() => {
+    chainWrap.classList.add('drop');
+  }, 1000);
+
+  setTimeout(() => {
+    // lock the visible state with an inline style so "treme" can never
+    // fall back to the base opacity:0 once the 'drop' class is removed
+    chainWrap.style.opacity = '1';
+    chainWrap.style.transform = 'translateY(0)';
+    chainWrap.classList.remove('drop');
+    chainWrap.classList.add('settle');
+  }, 1900);
+
+  setTimeout(() => {
+    chainWrap.classList.remove('settle');
+  }, 2400);
+
+  setTimeout(() => {
+    // only the two chain-link bars fade out here — the "treme"
+    // text stays put, this never touches chainWrap's own opacity
+    chainLeft.classList.add('snap-left');
+    chainRight.classList.add('snap-right');
+  }, 2300);
+
+  // 3. Gang reveals once Xtreme is fully assembled (2.5 - 3.0s)
+  //    and is then locked visible — only the chain links fade,
+  //    "Gang" itself is never touched by that animation.
+  setTimeout(() => {
+    gangLetter.classList.add('run');
+    setTimeout(() => {
+      gangLetter.style.opacity = '1';
+      gangLetter.style.animation = 'none';
+    }, 900);
+  }, 2500);
+
+  // 4. "By" / "SaumyaXtreme" slide in, then zoom-pulse (3.0 - 4.5s)
+  setTimeout(() => {
+    byWord.classList.add('run');
+    authorWord.classList.add('run');
+  }, 3000);
+
+  setTimeout(() => {
+    word2.classList.add('zoom');
+  }, 3600);
+
+  // 5. random, non-repeating tips for 5 seconds (4.5 - 9.5s)
+  setTimeout(() => {
+    const picks = shuffle(TIP_POOL);
+    const windowMs = 5000;
+    const perTip = 1250; // spacing between tip changes
+    const count = Math.min(picks.length, Math.floor(windowMs / perTip));
+    for(let i = 0; i < count; i++){
+      setTimeout(() => {
+        tipLine.textContent = picks[i];
+        tipLine.classList.remove('show');
+        void tipLine.offsetWidth; // restart animation
+        tipLine.classList.add('show');
+      }, i * perTip);
+    }
+  }, 4500);
+
+  // 6. bar is full at ~9.5s, wait 1.5s more, then launch login
+  setTimeout(() => {
+    document.getElementById('intro-screen').style.transition = 'opacity .5s ease';
+    document.getElementById('intro-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('intro-screen').classList.add('hidden');
+      // If a login already resolved while the intro was still playing
+      // (e.g. a cached/fast session), go straight to the main site
+      // instead of showing the login form again.
+      if(pendingLoggedInUser){
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-site').classList.remove('hidden');
+      } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+      }
+    }, 500);
+  }, TOTAL_MS + 1500);
+}
+
+/* =========================================================
+   CAPTCHA
+   ========================================================= */
+let currentCaptcha = '';
+
+function drawCaptcha(){
+  const canvas = document.getElementById('captcha-canvas');
+  const ctx = canvas.getContext('2d');
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  currentCaptcha = Array.from({length: 5}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#12121f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // noise lines
+  for(let i = 0; i < 6; i++){
+    ctx.strokeStyle = `rgba(34,211,255,${0.15 + Math.random() * 0.2})`;
+    ctx.beginPath();
+    ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+    ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+    ctx.stroke();
+  }
+
+  // characters
+  for(let i = 0; i < currentCaptcha.length; i++){
+    ctx.save();
+    const x = 14 + i * 22;
+    const y = 28 + (Math.random() * 6 - 3);
+    ctx.translate(x, y);
+    ctx.rotate((Math.random() * 30 - 15) * Math.PI / 180);
+    ctx.font = 'bold 22px Share Tech Mono, monospace';
+    ctx.fillStyle = i % 2 === 0 ? '#22d3ff' : '#ff2d55';
+    ctx.fillText(currentCaptcha[i], 0, 0);
+    ctx.restore();
+  }
+
+  // noise dots
+  for(let i = 0; i < 30; i++){
+    ctx.fillStyle = `rgba(238,240,255,${Math.random() * 0.3})`;
+    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1.5, 1.5);
+  }
+}
+
+document.getElementById('captcha-refresh').addEventListener('click', drawCaptcha);
+
+function setMessage(id, text, kind){
+  const el = document.getElementById(id);
+  el.textContent = text || '';
+  el.classList.remove('error', 'ok');
+  if(kind) el.classList.add(kind);
+}
+
+/* =========================================================
+   LOGIN
+   Firebase Auth signs in with an email, so the username the
+   member types is first resolved to its email via Firestore.
+   ========================================================= */
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById('login-submit');
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const captchaInput = document.getElementById('login-captcha').value.trim();
+
+  if(captchaInput.toUpperCase() !== currentCaptcha.toUpperCase()){
+    setMessage('login-message', 'XtremeGang autorization failed.', 'error');
+    drawCaptcha();
+    document.getElementById('login-captcha').value = '';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  setMessage('login-message', 'Signing in...', null);
+
+  try {
+    const doc = await withTimeout(
+      db.collection('usernames').doc(username.toLowerCase()).get(),
+      12000,
+      'TIMEOUT'
+    );
+    if(!doc.exists || !doc.data().email){
+      throw new Error('No account found for that username.');
+    }
+    const email = doc.data().email;
+    await withTimeout(
+      auth.signInWithEmailAndPassword(email, password),
+      12000,
+      'TIMEOUT'
+    );
+    // onAuthStateChanged below takes over from here
+  } catch (err) {
+    submitBtn.disabled = false;
+    if(err.message === 'TIMEOUT'){
+      setMessage('login-message', 'Taking too long to reach the server. If you opened this file directly (file://), try running it through a local server instead.', 'error');
+    } else {
+      setMessage('login-message', 'XtremeGang autorization failed.', 'error');
+    }
+    drawCaptcha();
+    document.getElementById('login-captcha').value = '';
+  }
+});
+
+/* =========================================================
+   SESSION STATE
+   ========================================================= */
+let registrationInProgress = false;
+let pendingLoggedInUser = false; // set by onAuthStateChanged if login resolves while intro is still playing
+
+auth.onAuthStateChanged((user) => {
+  const authScreen = document.getElementById('auth-screen');
+  const mainSite = document.getElementById('main-site');
+
+  if(user){
+    if(registrationInProgress) return; // account just created mid-signup, not a real login yet
+    document.getElementById('profile-name').textContent = user.displayName || 'Member';
+    document.getElementById('profile-pic').src =
+      `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.uid)}`;
+    syncPersonalPanel(user);
+
+    const sidebarPic = document.getElementById('ai-sidebar-pic');
+    const sidebarId  = document.getElementById('ai-sidebar-id');
+    if(sidebarPic) sidebarPic.src = document.getElementById('profile-pic').src;
+    if(sidebarId)  sidebarId.textContent = user.displayName || 'Member';
+
+    // Custom avatar images live in Firestore (profiles/{uid}.avatarDataUrl),
+    // not in Firebase Auth's photoURL — that field is too small to hold an
+    // actual image. Apply it once it loads, if the person has set one.
+    db.collection('profiles').doc(user.uid).get().then(doc => {
+      const avatarUrl = doc.exists ? doc.data().avatarDataUrl : null;
+      if(avatarUrl){
+        document.getElementById('profile-pic').src = avatarUrl;
+        if(sidebarPic) sidebarPic.src = avatarUrl;
+        const ppAvatar = document.getElementById('pp-avatar');
+        if(ppAvatar) ppAvatar.src = avatarUrl;
+      }
+    }).catch(() => { /* no profile doc yet — keep the default identicon */ });
+
+    // If intro is still playing, don't switch screens yet — just remember
+    // that we're logged in. The intro's own completion step checks this
+    // flag and reveals main-site directly instead of showing the login
+    // form, so a cached/fast login can never get stuck behind the intro.
+    pendingLoggedInUser = true;
+    if(!document.getElementById('intro-screen').classList.contains('hidden')) return;
+
+    authScreen.classList.add('hidden');
+    mainSite.classList.remove('hidden');
+  } else {
+    pendingLoggedInUser = false;
+    mainSite.classList.add('hidden');
+  }
+});
+
+const logoutBtn = document.getElementById('logout-btn');
+if(logoutBtn){
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+      document.getElementById('main-site').classList.add('hidden');
+      document.getElementById('auth-screen').classList.remove('hidden');
+      document.getElementById('login-form').reset();
+      drawCaptcha();
+    });
+  });
+}
+
+/* =========================================================
+   XTREMEAI CHAT
+   ---------------------------------------------------------
+   Chat history is stored in the browser's localStorage, so
+   each visitor's chats persist on their own device only —
+   nothing here is synced to a server (that's for the g4f
+   backend to handle later; see getAIReply()).
+   ========================================================= */
+const AI_STORAGE_KEY = 'xtremeai-chats';
+const AI_ACTIVE_KEY  = 'xtremeai-active-chat';
+
+const aiForm       = document.getElementById('ai-input-form');
+const aiInput      = document.getElementById('ai-input');
+const aiMessages   = document.getElementById('ai-messages');
+const aiHistoryEl  = document.getElementById('ai-history');
+const aiNewChatBtn = document.getElementById('ai-new-chat-btn');
+const aiAttachBtn  = document.getElementById('ai-attach-btn');
+const aiImageInput = document.getElementById('ai-image-input');
+const aiImagePreview = document.getElementById('ai-image-preview');
+const aiMicBtn      = document.getElementById('ai-mic-btn');
+
+let aiChats = [];
+let aiActiveChatId = null;
+let aiPendingImage = null; // { name, dataUrl } attached but not yet sent
+
+function aiLoadChats(){
+  try {
+    const raw = localStorage.getItem(AI_STORAGE_KEY);
+    aiChats = raw ? JSON.parse(raw) : [];
+  } catch(e){
+    aiChats = [];
+  }
+}
+
+function aiSaveChats(){
+  try {
+    localStorage.setItem(AI_STORAGE_KEY, JSON.stringify(aiChats));
+  } catch(e){ /* storage full or unavailable — fail silently */ }
+}
+
+function aiGetActiveChat(){
+  return aiChats.find(c => c.id === aiActiveChatId) || null;
+}
+
+function aiRenderHistory(){
+  aiHistoryEl.innerHTML = '';
+  if(aiChats.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'ai-history-empty';
+    empty.textContent = 'No chats yet';
+    aiHistoryEl.appendChild(empty);
+    return;
+  }
+  // newest first
+  [...aiChats].sort((a,b) => b.updatedAt - a.updatedAt).forEach(chat => {
+    const item = document.createElement('div');
+    item.className = 'ai-history-item' + (chat.id === aiActiveChatId ? ' active' : '');
+
+    const title = document.createElement('span');
+    title.className = 'ai-history-title';
+    title.textContent = chat.title || 'New Chat';
+
+    const del = document.createElement('button');
+    del.className = 'ai-history-delete';
+    del.type = 'button';
+    del.textContent = '\u00d7';
+    del.title = 'Delete chat';
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      aiDeleteChat(chat.id);
+    });
+
+    item.appendChild(title);
+    item.appendChild(del);
+    item.addEventListener('click', () => aiSelectChat(chat.id));
+    aiHistoryEl.appendChild(item);
+  });
+}
+
+function aiRenderMessages(){
+  aiMessages.innerHTML = '';
+  const chat = aiGetActiveChat();
+  const msgs = chat ? chat.messages : [];
+
+  if(msgs.length === 0){
+    appendAIMessageToDOM("Hey! I'm XtremeAI. Ask me anything to get started.", 'bot');
+    return;
+  }
+  msgs.forEach(m => appendAIMessageToDOM(m.text, m.who, m.image));
+}
+
+function appendAIMessageToDOM(text, who, imageDataUrl){
+  const row = document.createElement('div');
+  row.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-bot');
+
+  const avatar = document.createElement('div');
+  avatar.className = 'ai-msg-avatar';
+  if(who === 'user'){
+    const userPic = document.getElementById('profile-pic');
+    const img = document.createElement('img');
+    img.src = userPic ? userPic.src : 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
+    avatar.appendChild(img);
+  } else {
+    avatar.textContent = 'X';
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-msg-bubble';
+  if(text) bubble.appendChild(document.createTextNode(text));
+  if(imageDataUrl){
+    const img = document.createElement('img');
+    img.src = imageDataUrl;
+    bubble.appendChild(img);
+  }
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  aiMessages.appendChild(row);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+
+function aiCreateNewChat(){
+  const chat = {
+    id: 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+    title: 'New Chat',
+    messages: [],
+    updatedAt: Date.now()
+  };
+  aiChats.push(chat);
+  aiActiveChatId = chat.id;
+  localStorage.setItem(AI_ACTIVE_KEY, aiActiveChatId);
+  aiSaveChats();
+  aiRenderHistory();
+  aiRenderMessages();
+}
+
+function aiSelectChat(id){
+  aiActiveChatId = id;
+  localStorage.setItem(AI_ACTIVE_KEY, id);
+  aiRenderHistory();
+  aiRenderMessages();
+}
+
+function aiDeleteChat(id){
+  aiChats = aiChats.filter(c => c.id !== id);
+  aiSaveChats();
+  if(aiActiveChatId === id){
+    aiActiveChatId = aiChats.length ? aiChats[0].id : null;
+    localStorage.setItem(AI_ACTIVE_KEY, aiActiveChatId || '');
+  }
+  aiRenderHistory();
+  aiRenderMessages();
+}
+
+function aiInit(){
+  aiLoadChats();
+  const savedActive = localStorage.getItem(AI_ACTIVE_KEY);
+  if(savedActive && aiChats.some(c => c.id === savedActive)){
+    aiActiveChatId = savedActive;
+  } else if(aiChats.length){
+    aiActiveChatId = aiChats[0].id;
+  }
+  if(!aiActiveChatId){
+    aiCreateNewChat(); // creates + renders
+  } else {
+    aiRenderHistory();
+    aiRenderMessages();
+  }
+}
+aiInit();
+
+if(aiNewChatBtn){
+  aiNewChatBtn.addEventListener('click', aiCreateNewChat);
+}
+
+// --- image attach ---
+if(aiAttachBtn){
+  aiAttachBtn.addEventListener('click', () => aiImageInput.click());
+}
+if(aiImageInput){
+  aiImageInput.addEventListener('change', () => {
+    const file = aiImageInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      aiPendingImage = { name: file.name, dataUrl: reader.result };
+      aiRenderImagePreview();
+    };
+    reader.readAsDataURL(file);
+    aiImageInput.value = '';
+  });
+}
+function aiRenderImagePreview(){
+  aiImagePreview.innerHTML = '';
+  if(!aiPendingImage) return;
+  const chip = document.createElement('div');
+  chip.className = 'ai-image-chip';
+  const img = document.createElement('img');
+  img.src = aiPendingImage.dataUrl;
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.textContent = '\u00d7';
+  remove.addEventListener('click', () => {
+    aiPendingImage = null;
+    aiRenderImagePreview();
+  });
+  chip.appendChild(img);
+  chip.appendChild(remove);
+  aiImagePreview.appendChild(chip);
+}
+
+// --- mic input (Web Speech API, where supported) ---
+let aiRecognition = null;
+let aiListening = false;
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+if(SpeechRecognitionCtor && aiMicBtn){
+  aiRecognition = new SpeechRecognitionCtor();
+  aiRecognition.continuous = false;
+  aiRecognition.interimResults = false;
+  aiRecognition.lang = 'en-US';
+
+  aiRecognition.addEventListener('result', (e) => {
+    const transcript = e.results[0][0].transcript;
+    aiInput.value = (aiInput.value ? aiInput.value + ' ' : '') + transcript;
+  });
+  aiRecognition.addEventListener('end', () => {
+    aiListening = false;
+    aiMicBtn.classList.remove('listening');
+  });
+  aiRecognition.addEventListener('error', () => {
+    aiListening = false;
+    aiMicBtn.classList.remove('listening');
+  });
+
+  aiMicBtn.addEventListener('click', () => {
+    if(aiListening){
+      aiRecognition.stop();
+      return;
+    }
+    aiListening = true;
+    aiMicBtn.classList.add('listening');
+    aiRecognition.start();
+  });
+} else if(aiMicBtn){
+  aiMicBtn.addEventListener('click', () => {
+    alert('Voice input is not supported in this browser.');
+  });
+}
+
+// =========================================================
+// AI BACKEND CONFIG
+// ---------------------------------------------------------
+// Point this at your server's HTTPS endpoint once Nginx + SSL
+// are set up in front of the bot's API (see bot_api_example.py).
+// Must be https:// — GitHub Pages will block plain http:// calls
+// as mixed content.
+// =========================================================
+const XTREMEAI_API_URL = "https://YOUR-DOMAIN-HERE.com/api/chat";
+
+async function getAIReply(userText, imageDataUrl){
+  try {
+    const res = await withTimeout(
+      fetch(XTREMEAI_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userText,
+          image: imageDataUrl || undefined
+        })
+      }),
+      20000,
+      'TIMEOUT'
+    );
+
+    if(!res.ok){
+      return "( Server error " + res.status + " — try again in a moment )";
+    }
+
+    const data = await res.json();
+    return data.reply || "( Empty response from server )";
+
+  } catch(err){
+    if(err && err.message === 'TIMEOUT'){
+      return "( XtremeAI is taking too long to respond — try again )";
+    }
+    return "( Couldn't reach the XtremeAI server. Is it online? )";
+  }
+}
+
+if(aiForm){
+  aiForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = aiInput.value.trim();
+    const image = aiPendingImage;
+    if(!text && !image) return;
+
+    const chat = aiGetActiveChat();
+    if(!chat) return;
+
+    chat.messages.push({ text, who:'user', image: image ? image.dataUrl : undefined });
+    if(chat.title === 'New Chat' && text){
+      chat.title = text.slice(0, 40) + (text.length > 40 ? '…' : '');
+    }
+    chat.updatedAt = Date.now();
+    aiSaveChats();
+    aiRenderHistory();
+    appendAIMessageToDOM(text, 'user', image ? image.dataUrl : undefined);
+
+    aiInput.value = '';
+    aiPendingImage = null;
+    aiRenderImagePreview();
+
+    const reply = await getAIReply(text, image ? image.dataUrl : undefined);
+    chat.messages.push({ text: reply, who:'bot' });
+    chat.updatedAt = Date.now();
+    aiSaveChats();
+    aiRenderHistory();
+    appendAIMessageToDOM(reply, 'bot');
+  });
+}
+
+
+/* =========================================================
+   TAB SWITCHING (dashboard-style nav)
+   ---------------------------------------------------------
+   Any nav link with a #hash that matches a .tab-section id
+   swaps that section in and hides the rest, instead of doing
+   a normal page-jump. Hashes with no matching section yet
+   (e.g. #rules, #shop before they're built) are ignored here
+   so those links stay harmless placeholders for now.
+   ========================================================= */
+function showTab(id){
+  const target = document.getElementById(id);
+  if(!target || !target.classList.contains('tab-section')) return false;
+  document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+  target.classList.add('active');
+  window.scrollTo({ top:0, behavior:'instant' in window ? 'instant' : 'auto' });
+  return true;
+}
+
+document.querySelectorAll('#main-site a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const id = link.getAttribute('href').slice(1);
+    if(showTab(id)){
+      e.preventDefault();
+      history.replaceState(null, '', '#' + id);
+      closeProfileDropdown_ifExists();
+    }
+    // if no matching section exists yet, let the default anchor
+    // behavior happen (harmless no-op scroll) instead of breaking the click
+  });
+});
+
+// Also handle hash changes triggered any other way (e.g. buttons that do
+// location.hash = '#home' instead of being real <a> links), so every
+// entry point into a tab behaves the same.
+window.addEventListener('hashchange', () => {
+  const id = location.hash.slice(1);
+  if(id) showTab(id);
+});
+
+function closeProfileDropdown_ifExists(){
+  const dd = document.getElementById('profile-dropdown');
+  const chip = document.getElementById('profile-chip');
+  if(dd) dd.classList.remove('open');
+  if(chip) chip.classList.remove('open');
+}
+
+// on load, honor an existing #hash (e.g. someone bookmarked #about)
+window.addEventListener('DOMContentLoaded', () => {
+  const initialId = location.hash.slice(1);
+  if(initialId) showTab(initialId);
+});
+
+/* =========================================================
+   DETAILED RANKINGS MODAL
+   ========================================================= */
+const detailedRankingsBtn = document.getElementById('detailed-rankings-btn');
+const detailedRankingsOverlay = document.getElementById('detailed-rankings-overlay');
+const detailedRankingsClose = document.getElementById('detailed-rankings-close');
+const modalTierNote = document.getElementById('modal-tier-note');
+const modalBox = document.getElementById('modal-box');
+const modalTierSelectView = document.getElementById('modal-tier-select-view');
+const modalTierDetailView = document.getElementById('modal-tier-detail-view');
+const modalDetailTitle = document.getElementById('modal-detail-title');
+const modalDetailContent = document.getElementById('modal-detail-content');
+const modalBackBtn = document.getElementById('modal-back-btn');
+
+// ---- rank point data, per tier ----
+// Only "normal" is filled in for now — pro/premium/platinum are still
+// being designed, so they fall back to a "coming soon" note.
+// Ordered highest -> lowest, colors matched to the main Rankings tab.
+const RANK_TIER_DATA = {
+  normal: {
+    title: 'Normal Ranks',
+    groups: [
+      {
+        heading: 'Staff Ranks',
+        ranks: [
+          { name: 'Owner', points: 300, color: 'rk-red', special: [
+            { label: 'Helping Points', value: 60 },
+            { label: 'Disciplinary Points', value: 20 },
+            { label: 'Glitched Points', value: 20 },
+            { label: 'Management Points', value: 20 },
+            { label: 'Rankinary Points', value: 20 },
+            { label: 'CAO Points', value: 30 },
+            { label: 'Leadership Points', value: 50 },
+          ]},
+          { name: 'Co-Owner', points: 294, color: 'rk-orange', special: [{ label: 'Leadership Points', value: 20 }] },
+          { name: 'Advisor', points: 288, color: 'rk-red', special: [{ label: 'CAO Points', value: 20 }] },
+          { name: 'HDS', points: 280, color: 'rk-yellow', special: [{ label: 'Rankinary Points', value: 12 }] },
+          { name: 'Glarient', points: 270, color: 'rk-purple', special: [{ label: 'Management Points', value: 16 }] },
+          { name: 'Jr. Glarient', points: 270, color: 'rk-magenta', special: [{ label: 'Management Points', value: 8 }] },
+          { name: 'Senior Admin', points: 260, color: 'rk-red', special: [{ label: 'Glitched Points', value: 16 }] },
+          { name: 'Admin', points: 260, color: 'rk-red', special: [{ label: 'Glitched Points', value: 6 }] },
+          { name: 'Sr. Moderator', points: 250, color: 'rk-violet', special: [{ label: 'Disciplinary Points', value: 10 }] },
+          { name: 'Moderator', points: 250, color: 'rk-purple', special: [{ label: 'Disciplinary Points', value: 6 }] },
+          { name: 'Jr. Moderator', points: 250, color: 'rk-pink', special: [{ label: 'Disciplinary Points', value: 4 }] },
+          { name: 'Sr. Helper', points: 220, color: 'rk-lime', special: [{ label: 'Helping Points', value: 12 }] },
+          { name: 'Helper', points: 210, color: 'rk-green', special: [{ label: 'Helping Points', value: 8 }] },
+          { name: 'Jr. Helper', points: 200, color: 'rk-green', special: [{ label: 'Helping Points', value: 5 }] },
+        ]
+      },
+      {
+        heading: 'Member Ranks',
+        ranks: [
+          { name: 'Tank', points: 180, color: 'rk-blue', advancements: [
+            'Im Dad', 'Knock - Knock', 'Too high AURA',
+            'Voiding technique', 'good games but not quite enough'
+          ]},
+          { name: 'Priest', points: 140, color: 'rk-magenta', advancements: [
+            'Mastered One', 'The god of the time', 'The peace',
+            'Chilling the time takes you high', 'Immortality'
+          ]},
+          { name: 'Dragon', points: 100, color: 'rk-orange', advancements: [
+            'TrustWorthy', 'The loyalty is the key', 'Domain Arena', 'The king of the south'
+          ]},
+          { name: 'Media', points: 86, color: 'rk-pink', special: [{ label: 'Info Points', value: 6 }] },
+          { name: 'Divine', points: 80, color: 'rk-cyan' },
+          { name: 'Ultra', points: 50, color: 'rk-lime' },
+          { name: 'Hero', points: 20, color: 'rk-lightblue' },
+          { name: 'Member', points: 0, color: 'rk-gray' },
+        ]
+      }
+    ]
+  }
+  // pro, premium, platinum — added later
+};
+
+function renderRankRow(rank){
+  const row = document.createElement('div');
+  row.className = 'rank-row';
+
+  const head = document.createElement('div');
+  head.className = 'rank-row-head';
+
+  const name = document.createElement('span');
+  name.className = 'rank-row-name' + (rank.color ? ' ' + rank.color : '');
+  name.textContent = rank.name;
+
+  const points = document.createElement('span');
+  points.className = 'rank-row-points';
+  points.textContent = rank.points + ' pts';
+
+  head.appendChild(name);
+  head.appendChild(points);
+  row.appendChild(head);
+
+  if(rank.special && rank.special.length){
+    const specialWrap = document.createElement('div');
+    specialWrap.className = 'rank-row-special';
+    rank.special.forEach(s => {
+      const chip = document.createElement('span');
+      chip.className = 'rank-row-chip';
+      chip.textContent = s.value + ' ' + s.label;
+      specialWrap.appendChild(chip);
+    });
+    row.appendChild(specialWrap);
+  }
+
+  if(rank.advancements && rank.advancements.length){
+    const list = document.createElement('ul');
+    list.className = 'rank-row-advancements';
+    rank.advancements.forEach(a => {
+      const li = document.createElement('li');
+      li.textContent = a;
+      list.appendChild(li);
+    });
+    row.appendChild(list);
+  }
+
+  return row;
+}
+
+function showTierDetail(tierKey){
+  const tier = RANK_TIER_DATA[tierKey];
+  if(!tier){
+    // not built yet — just show the inline note instead of switching views
+    const label = tierKey.charAt(0).toUpperCase() + tierKey.slice(1) + ' Ranks';
+    modalTierNote.textContent = label + ' — coming soon.';
+    return;
+  }
+
+  modalDetailTitle.textContent = tier.title;
+  modalDetailContent.innerHTML = '';
+  tier.groups.forEach(group => {
+    const heading = document.createElement('div');
+    heading.className = 'modal-subheading';
+    heading.textContent = group.heading;
+    modalDetailContent.appendChild(heading);
+
+    group.ranks.forEach(rank => {
+      modalDetailContent.appendChild(renderRankRow(rank));
+    });
+  });
+
+  modalTierSelectView.classList.add('hidden');
+  modalTierDetailView.classList.remove('hidden');
+  modalBox.classList.add('wide');
+  modalBox.scrollTop = 0;
+}
+
+function showTierSelect(){
+  modalTierDetailView.classList.add('hidden');
+  modalTierSelectView.classList.remove('hidden');
+  modalBox.classList.remove('wide');
+}
+
+function openDetailedRankings(){
+  detailedRankingsOverlay.classList.add('open');
+  modalTierNote.textContent = '';
+  showTierSelect();
+}
+function closeDetailedRankings(){
+  detailedRankingsOverlay.classList.remove('open');
+}
+
+if(detailedRankingsBtn){
+  detailedRankingsBtn.addEventListener('click', openDetailedRankings);
+}
+if(detailedRankingsClose){
+  detailedRankingsClose.addEventListener('click', closeDetailedRankings);
+}
+if(detailedRankingsOverlay){
+  detailedRankingsOverlay.addEventListener('click', (e) => {
+    if(e.target === detailedRankingsOverlay) closeDetailedRankings();
+  });
+}
+if(modalBackBtn){
+  modalBackBtn.addEventListener('click', showTierSelect);
+}
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    closeDetailedRankings();
+    if(lbMemberOverlay) lbMemberOverlay.classList.remove('open');
+    if(typeof closeSubjectPhotos === 'function') closeSubjectPhotos();
+  }
+});
+
+document.querySelectorAll('.modal-tier-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    modalTierNote.textContent = '';
+    showTierDetail(btn.dataset.tier);
+  });
+});
+
+/* =========================================================
+   LEADERBOARD
+   ---------------------------------------------------------
+   PLACEHOLDER DATA — this is mock/example data so the layout
+   is testable. Replace LEADERBOARD_DATA with a real Firestore
+   query (e.g. a 'leaderboard' or 'users' collection ordered by
+   points) once that's ready.
+   ========================================================= */
+const LEADERBOARD_DATA = [
+  {
+    username: 'SaumyaXtreme',
+    rankName: 'Owner',
+    rankColor: 'rk-red',
+    points: 300,
+    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=SaumyaXtreme',
+    breakdown: [
+      { label: 'Helping Points', value: 60 },
+      { label: 'Disciplinary Points', value: 20 },
+      { label: 'Glitched Points', value: 20 },
+      { label: 'Management Points', value: 20 },
+      { label: 'Rankinary Points', value: 20 },
+      { label: 'CAO Points', value: 30 },
+      { label: 'Leadership Points', value: 50 },
+    ]
+  },
+  {
+    username: 'ExampleMember2',
+    rankName: 'Glarient',
+    rankColor: 'rk-purple',
+    points: 270,
+    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=ExampleMember2',
+    breakdown: [{ label: 'Management Points', value: 16 }]
+  },
+  {
+    username: 'ExampleMember3',
+    rankName: 'Tank',
+    rankColor: 'rk-blue',
+    points: 180,
+    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=ExampleMember3',
+    breakdown: []
+  },
+];
+
+/* =========================================================
+   PERSONAL PANEL
+   ---------------------------------------------------------
+   Fills in the read-only account overview (avatar, name,
+   email, rank, points). This is a separate section from
+   Edit Profile — that one stays the editing form; this one
+   is just a summary view. Called on login and whenever the
+   avatar/name changes.
+   ========================================================= */
+function syncPersonalPanel(user){
+  if(!user) return;
+  const ppAvatar = document.getElementById('pp-avatar');
+  const ppName = document.getElementById('pp-name');
+  const ppEmail = document.getElementById('pp-email');
+  const ppRank = document.getElementById('pp-rank');
+  const ppPoints = document.getElementById('pp-points');
+
+  if(ppAvatar) ppAvatar.src = document.getElementById('profile-pic').src;
+  if(ppName) ppName.textContent = user.displayName || 'Member';
+  if(ppEmail) ppEmail.textContent = user.email || '';
+
+  const entry = LEADERBOARD_DATA.find(m =>
+    m.username.toLowerCase() === (user.displayName || '').toLowerCase()
+  );
+  if(ppRank) ppRank.textContent = entry ? entry.rankName : '—';
+  if(ppPoints) ppPoints.textContent = entry ? entry.points : '—';
+
+  // owner-only member management — exact match, not case-insensitive,
+  // since only one account can ever hold the OWNER_USERNAME username
+  const adminBlock = document.getElementById('pp-admin-block');
+  if(adminBlock){
+    if(user.displayName === OWNER_USERNAME){
+      adminBlock.classList.remove('hidden');
+      loadMemberList();
+    } else {
+      adminBlock.classList.add('hidden');
+    }
+  }
+}
+
+/* =========================================================
+   OWNER-ONLY: ADD MEMBER
+   Same shape as the old public sign-up flow, just only
+   reachable when the logged-in user is OWNER_USERNAME. Creates
+   the auth account through the secondary app instance (so the
+   owner stays signed in), then claims the username inside a
+   transaction so two members can never end up with the same
+   username even if two adds happen at once.
+   ========================================================= */
+document.getElementById('pp-add-member-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById('pam-submit');
+  const username = document.getElementById('pam-username').value.trim();
+  const email = document.getElementById('pam-email').value.trim();
+  const password = document.getElementById('pam-password').value;
+  const usernameKey = username.toLowerCase();
+
+  if(!/^[a-zA-Z0-9_]{3,20}$/.test(username)){
+    setMessage('pp-add-message', 'Username: 3-20 letters, numbers or underscores only.', 'error');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  setMessage('pp-add-message', 'Creating account...', null);
+
+  const usernameRef = memberCreatorDb.collection('usernames').doc(usernameKey);
+  let cred;
+
+  try {
+    cred = await withTimeout(
+      memberCreatorAuth.createUserWithEmailAndPassword(email, password),
+      12000,
+      'TIMEOUT'
+    );
+  } catch (err) {
+    submitBtn.disabled = false;
+    let msg = err.message || 'Could not create the account.';
+    if(err.code === 'auth/email-already-in-use') msg = 'That email is already registered.';
+    else if(err.message === 'TIMEOUT') msg = 'Taking too long to reach the server.';
+    setMessage('pp-add-message', msg, 'error');
+    return;
+  }
+
+  setMessage('pp-add-message', 'Claiming username...', null);
+
+  try {
+    await memberCreatorDb.runTransaction(async (tx) => {
+      const doc = await tx.get(usernameRef);
+      if(doc.exists){
+        throw new Error('USERNAME_TAKEN');
+      }
+      tx.set(usernameRef, {
+        uid: cred.user.uid,
+        email: email,
+        username: username,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await cred.user.updateProfile({ displayName: username });
+  } catch (err) {
+    await cred.user.delete().catch(() => {});
+    submitBtn.disabled = false;
+    setMessage('pp-add-message',
+      err.message === 'USERNAME_TAKEN' ? 'That username is already taken.' : 'Could not reach the server. Try again.',
+      'error');
+    return;
+  }
+
+  // sign the secondary app instance back out so it holds no session
+  await memberCreatorAuth.signOut();
+
+  setMessage('pp-add-message', 'Member added.', 'ok');
+  submitBtn.disabled = false;
+  document.getElementById('pp-add-member-form').reset();
+  loadMemberList();
+});
+
+/* =========================================================
+   OWNER-ONLY: MEMBER LIST + DELETE
+   ========================================================= */
+async function loadMemberList(){
+  const listEl = document.getElementById('pp-member-list');
+  if(!listEl) return;
+  setMessage('pp-member-list-message', 'Loading...', null);
+  listEl.innerHTML = '';
+
+  try {
+    const snap = await db.collection('usernames').orderBy('username').get();
+    setMessage('pp-member-list-message', '', null);
+
+    if(snap.empty){
+      listEl.innerHTML = '<li class="pp-admin-empty">No members yet.</li>';
+      return;
+    }
+
+    snap.forEach(doc => {
+      const data = doc.data();
+      const li = document.createElement('li');
+      li.className = 'pp-admin-row';
+
+      const info = document.createElement('div');
+      info.className = 'pp-admin-row-info';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'pp-admin-username';
+      nameEl.textContent = data.username || doc.id;
+      const emailEl = document.createElement('div');
+      emailEl.className = 'pp-admin-email';
+      emailEl.textContent = data.email || '';
+      info.appendChild(nameEl);
+      info.appendChild(emailEl);
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'pp-admin-delete';
+      delBtn.textContent = 'Delete';
+      delBtn.addEventListener('click', () => deleteMemberFromPanel(doc.id, data.uid, data.username || doc.id));
+
+      li.appendChild(info);
+      li.appendChild(delBtn);
+      listEl.appendChild(li);
+    });
+  } catch (err) {
+    setMessage('pp-member-list-message', 'Could not load members.', 'error');
+  }
+}
+
+/* =========================================================
+   OWNER-ONLY: DELETE MEMBER
+   Deletes their usernames doc (which is what the Libraries
+   page listens to — removing it makes their library box
+   disappear automatically) and their profiles doc, and blocks
+   them from logging in going forward.
+   ========================================================= */
+async function deleteMemberFromPanel(usernameKey, uid, displayName){
+  if(!confirm(`Remove ${displayName} from XtremeGang? They will no longer be able to log in.`)) return;
+
+  setMessage('pp-member-list-message', 'Removing...', null);
+  try {
+    await db.collection('usernames').doc(usernameKey).delete();
+    if(uid){
+      await db.collection('profiles').doc(uid).delete().catch(() => {});
+    }
+    setMessage('pp-member-list-message', 'Member removed.', 'ok');
+  } catch (err) {
+    setMessage('pp-member-list-message', 'Could not remove member.', 'error');
+  }
+  loadMemberList();
+}
+
+const leaderboardRowsEl = document.getElementById('leaderboard-rows');
+
+function renderLeaderboard(){
+  if(!leaderboardRowsEl) return;
+  leaderboardRowsEl.innerHTML = '';
+
+  if(LEADERBOARD_DATA.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'leaderboard-empty';
+    empty.textContent = 'No members on the leaderboard yet.';
+    leaderboardRowsEl.appendChild(empty);
+    return;
+  }
+
+  // sort highest points first
+  const sorted = [...LEADERBOARD_DATA].sort((a, b) => b.points - a.points);
+
+  sorted.forEach((member, i) => {
+    const row = document.createElement('div');
+    row.className = 'leaderboard-row';
+
+    const division = document.createElement('span');
+    division.className = 'lb-col lb-col-division';
+    division.textContent = (i + 1) + '.';
+
+    const imageWrap = document.createElement('span');
+    imageWrap.className = 'lb-col lb-col-image';
+    const img = document.createElement('img');
+    img.src = member.image;
+    imageWrap.appendChild(img);
+
+    const rank = document.createElement('span');
+    rank.className = 'lb-col lb-col-rank' + (member.rankColor ? ' ' + member.rankColor : '');
+    rank.textContent = '[' + member.rankName + ']';
+
+    const username = document.createElement('span');
+    username.className = 'lb-col lb-col-username';
+    username.textContent = member.username;
+
+    const points = document.createElement('span');
+    points.className = 'lb-col lb-col-points';
+    points.textContent = member.points + ' pts';
+
+    row.appendChild(division);
+    row.appendChild(imageWrap);
+    row.appendChild(rank);
+    row.appendChild(username);
+    row.appendChild(points);
+
+    row.addEventListener('click', () => openMemberPanel(member));
+    leaderboardRowsEl.appendChild(row);
+  });
+}
+renderLeaderboard();
+
+/* =========================================================
+   WORK LIBRARIES
+   ---------------------------------------------------------
+   Every registered member gets an auto-created library.
+   Member list is pulled live from the 'usernames' collection
+   (written at signup — see the register handler above), so
+   new members appear here automatically with no manual data
+   entry. Each member's avatar comes from profiles/{uid} if
+   they've set a custom one, otherwise a generated identicon.
+
+   Subject list is sourced from subjects.txt — every member's
+   library currently shares this same subject list. Edit
+   SUBJECTS_LIST to change what shows up under each library.
+   ========================================================= */
+const SUBJECTS_LIST = [
+  'English Litreature',
+  'English Grammar',
+  'Hindi Lireature',
+  'Hindi Grammar',
+  'Mathematics',
+  'Science',
+  'History',
+  'Geography',
+  'Civics',
+  'Computer Science',
+  'Sanskrit',
+  'Moral Science',
+  'General Knowlegde',
+  'Drawing',
+  'Revision Assesments'
+];
+
+const librariesListEl = document.getElementById('libraries-list');
+const librariesLoadingEl = document.getElementById('libraries-loading');
+
+function buildSubjectsPanel(member){
+  const panel = document.createElement('div');
+  panel.className = 'library-row-subjects hidden';
+  SUBJECTS_LIST.forEach(subject => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'subject-btn';
+    btn.textContent = subject;
+    btn.addEventListener('click', () => openSubjectPhotos(member, subject));
+    panel.appendChild(btn);
+  });
+  return panel;
+}
+
+function buildLibraryRow(member){
+  const wrap = document.createElement('div');
+  wrap.className = 'library-member';
+
+  const row = document.createElement('button');
+  row.type = 'button';
+  row.className = 'library-row';
+
+  const avatar = document.createElement('img');
+  avatar.className = 'library-row-avatar';
+  avatar.src = member.avatarUrl;
+  avatar.alt = '';
+
+  const name = document.createElement('span');
+  name.className = 'library-row-name';
+  name.textContent = member.username + "'s Library";
+
+  const arrow = document.createElement('span');
+  arrow.className = 'library-row-arrow';
+  arrow.textContent = '▸';
+
+  row.appendChild(avatar);
+  row.appendChild(name);
+  row.appendChild(arrow);
+
+  const subjectsPanel = buildSubjectsPanel(member);
+
+  row.addEventListener('click', () => {
+    const isOpen = !subjectsPanel.classList.contains('hidden');
+    // accordion behavior: close any other open library before opening this one
+    librariesListEl.querySelectorAll('.library-row-subjects').forEach(p => {
+      if(p !== subjectsPanel) p.classList.add('hidden');
+    });
+    librariesListEl.querySelectorAll('.library-row').forEach(r => {
+      if(r !== row) r.classList.remove('open');
+    });
+    subjectsPanel.classList.toggle('hidden');
+    row.classList.toggle('open', !isOpen);
+  });
+
+  wrap.appendChild(row);
+  wrap.appendChild(subjectsPanel);
+  return wrap;
+}
+
+function renderLibraries(members, emptyMessage){
+  if(!librariesListEl) return;
+  librariesListEl.innerHTML = '';
+
+  if(members.length === 0){
+    const empty = document.createElement('p');
+    empty.className = 'libraries-empty-msg';
+    empty.textContent = emptyMessage || 'No libraries yet — be the first to join!';
+    librariesListEl.appendChild(empty);
+    return;
+  }
+
+  members
+    .sort((a, b) => a.username.localeCompare(b.username))
+    .forEach(member => librariesListEl.appendChild(buildLibraryRow(member)));
+}
+
+/* =========================================================
+   LIBRARIES SEARCH
+   Filters the already-loaded member list by username as the
+   person types — no extra Firestore reads, just an in-memory
+   filter over allLibraryMembers, re-rendered on every keystroke.
+   ========================================================= */
+let allLibraryMembers = [];
+const librariesSearchInput = document.getElementById('libraries-search');
+
+function applyLibrarySearch(){
+  const term = librariesSearchInput ? librariesSearchInput.value.trim().toLowerCase() : '';
+  if(!term){
+    renderLibraries(allLibraryMembers);
+    return;
+  }
+  const filtered = allLibraryMembers.filter(m => m.username.toLowerCase().includes(term));
+  renderLibraries(filtered, `No libraries match "${librariesSearchInput.value.trim()}".`);
+}
+
+if(librariesSearchInput){
+  librariesSearchInput.addEventListener('input', applyLibrarySearch);
+}
+
+// Live-updates: any time someone registers (a new 'usernames' doc is
+// written) or updates their avatar, this list refreshes automatically
+// for everyone with the tab open — no page reload needed.
+db.collection('usernames').onSnapshot(async (snapshot) => {
+  const entries = snapshot.docs.map(doc => doc.data());
+
+  // Look up each member's custom avatar (profiles/{uid}.avatarDataUrl),
+  // falling back to a generated identicon if they haven't set one.
+  const members = await Promise.all(entries.map(async (entry) => {
+    let avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(entry.uid)}`;
+    try {
+      const profileDoc = await db.collection('profiles').doc(entry.uid).get();
+      if(profileDoc.exists && profileDoc.data().avatarDataUrl){
+        avatarUrl = profileDoc.data().avatarDataUrl;
+      }
+    } catch (err) { /* fall back to identicon */ }
+    return { username: entry.username, uid: entry.uid, avatarUrl };
+  }));
+
+  allLibraryMembers = members;
+  applyLibrarySearch();
+}, (err) => {
+  console.error('Could not load libraries:', err);
+  if(librariesLoadingEl) librariesLoadingEl.textContent = 'Could not load libraries — try again later.';
+});
+
+// --- member detail panel ---
+const lbMemberOverlay = document.getElementById('lb-member-overlay');
+const lbMemberClose = document.getElementById('lb-member-close');
+const lbMemberPic = document.getElementById('lb-member-pic');
+const lbMemberUsername = document.getElementById('lb-member-username');
+const lbMemberRank = document.getElementById('lb-member-rank');
+const lbMemberPoints = document.getElementById('lb-member-points');
+
+function openMemberPanel(member){
+  lbMemberPic.src = member.image;
+  lbMemberUsername.textContent = member.username;
+  lbMemberRank.textContent = '[' + member.rankName + ']';
+  lbMemberRank.className = 'lb-member-rank' + (member.rankColor ? ' ' + member.rankColor : '');
+
+  lbMemberPoints.innerHTML = '';
+  const totalChip = document.createElement('span');
+  totalChip.className = 'rank-row-chip';
+  totalChip.textContent = member.points + ' Total Points';
+  lbMemberPoints.appendChild(totalChip);
+
+  (member.breakdown || []).forEach(b => {
+    const chip = document.createElement('span');
+    chip.className = 'rank-row-chip';
+    chip.textContent = b.value + ' ' + b.label;
+    lbMemberPoints.appendChild(chip);
+  });
+
+  lbMemberOverlay.classList.add('open');
+}
+if(lbMemberClose){
+  lbMemberClose.addEventListener('click', () => lbMemberOverlay.classList.remove('open'));
+}
+if(lbMemberOverlay){
+  lbMemberOverlay.addEventListener('click', (e) => {
+    if(e.target === lbMemberOverlay) lbMemberOverlay.classList.remove('open');
+  });
+}
+
+/* =========================================================
+   SUBJECT PHOTOS MODAL
+   ---------------------------------------------------------
+   Files live in Firestore at libraries/{uid}/photos/{photoId},
+   each doc: { subject, dataUrl, chapterNumber, chapterName,
+   label, createdAt }. Anyone can view a member's subject files;
+   only that member (auth.currentUser.uid === the library owner's
+   uid) can add or delete from it. Every file is labeled
+   "Chapter - {number} {name}" and listed sorted by chapter
+   number so it reads like a table of contents.
+
+   NOTE: this assumes Firestore security rules allow authenticated
+   reads on libraries -> photos subcollections, and writes only
+   where request.auth.uid matches the parent library's uid — that
+   needs to be set in the Firebase console alongside the existing
+   rules for 'profiles' and 'usernames'.
+   ========================================================= */
+const subjectPhotosOverlay = document.getElementById('subject-photos-overlay');
+const subjectPhotosClose = document.getElementById('subject-photos-close');
+const subjectPhotosTitle = document.getElementById('subject-photos-title');
+const spUploadRow = document.getElementById('sp-upload-row');
+const spChapterNumberSelect = document.getElementById('sp-chapter-number');
+const spChapterNameInput = document.getElementById('sp-chapter-name');
+const spPhotoInput = document.getElementById('sp-photo-input');
+const spUploadBtn = document.getElementById('sp-upload-btn');
+const spUploadStatus = document.getElementById('sp-upload-status');
+const spPhotoGrid = document.getElementById('sp-photo-grid');
+const spEmptyMsg = document.getElementById('sp-empty-msg');
+
+// fill the chapter dropdown with 1–28 once, on page load
+if(spChapterNumberSelect){
+  for(let i = 1; i <= 28; i++){
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = 'Chapter ' + i;
+    spChapterNumberSelect.appendChild(opt);
+  }
+}
+
+let spUnsubscribe = null; // detaches the live listener when the modal closes
+let spCurrentMember = null;
+let spCurrentSubject = null;
+
+function renderSubjectPhotos(photos, isOwner){
+  spPhotoGrid.innerHTML = '';
+
+  if(photos.length === 0){
+    spEmptyMsg.classList.remove('hidden');
+  } else {
+    spEmptyMsg.classList.add('hidden');
+  }
+
+  photos.forEach((photo, index) => {
+    const item = document.createElement('div');
+    item.className = 'sp-photo-item';
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'sp-photo-item-img-wrap';
+
+    const img = document.createElement('img');
+    img.src = photo.dataUrl;
+    img.alt = photo.label || '';
+    imgWrap.addEventListener('click', () => openLightbox(photos, index));
+    imgWrap.appendChild(img);
+
+    if(isOwner){
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'sp-photo-delete';
+      delBtn.setAttribute('aria-label', 'Delete');
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        db.collection('libraries').doc(spCurrentMember.uid)
+          .collection('photos').doc(photo.id).delete()
+          .catch(err => console.error('Could not delete file:', err));
+      });
+      imgWrap.appendChild(delBtn);
+    }
+
+    item.appendChild(imgWrap);
+
+    // label reads "Chapter - {number} {name}" — falls back to
+    // "Untitled" for any older entries added before this existed
+    const label = document.createElement('div');
+    label.className = 'sp-photo-label';
+    label.textContent = photo.label ||
+      (photo.chapterNumber ? `Chapter - ${photo.chapterNumber} ${photo.chapterName || ''}`.trim() : 'Untitled');
+    item.appendChild(label);
+
+    spPhotoGrid.appendChild(item);
+  });
+}
+
+function openSubjectPhotos(member, subject){
+  spCurrentMember = member;
+  spCurrentSubject = subject;
+
+  const isOwner = !!(auth.currentUser && auth.currentUser.uid === member.uid);
+
+  subjectPhotosTitle.textContent = member.username + "'s Library — " + subject;
+  spUploadRow.classList.toggle('hidden', !isOwner);
+  spUploadStatus.textContent = '';
+  if(spChapterNumberSelect) spChapterNumberSelect.value = '';
+  if(spChapterNameInput) spChapterNameInput.value = '';
+  spPhotoGrid.innerHTML = '';
+  spEmptyMsg.classList.add('hidden');
+
+  if(spUnsubscribe) spUnsubscribe();
+  spUnsubscribe = db.collection('libraries').doc(member.uid)
+    .collection('photos')
+    .where('subject', '==', subject)
+    .onSnapshot(snapshot => {
+      const photos = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => {
+          const chapterDiff = (a.chapterNumber || 0) - (b.chapterNumber || 0);
+          if(chapterDiff !== 0) return chapterDiff;
+          return (a.createdAt?.toMillis?.() || 0) - (b.createdAt?.toMillis?.() || 0);
+        });
+      renderSubjectPhotos(photos, isOwner);
+    }, err => {
+      console.error('Could not load photos:', err);
+      spEmptyMsg.textContent = 'Could not load photos — try again later.';
+      spEmptyMsg.classList.remove('hidden');
+    });
+
+  subjectPhotosOverlay.classList.add('open');
+}
+
+function closeSubjectPhotos(){
+  subjectPhotosOverlay.classList.remove('open');
+  if(spUnsubscribe){ spUnsubscribe(); spUnsubscribe = null; }
+  spCurrentMember = null;
+  spCurrentSubject = null;
+  if(typeof closeLightbox === 'function') closeLightbox();
+}
+
+if(subjectPhotosClose){
+  subjectPhotosClose.addEventListener('click', closeSubjectPhotos);
+}
+if(subjectPhotosOverlay){
+  subjectPhotosOverlay.addEventListener('click', (e) => {
+    if(e.target === subjectPhotosOverlay) closeSubjectPhotos();
+  });
+}
+
+if(spUploadBtn){
+  spUploadBtn.addEventListener('click', () => {
+    const num = spChapterNumberSelect ? spChapterNumberSelect.value : '';
+    const name = spChapterNameInput ? spChapterNameInput.value.trim() : '';
+    if(!num || !name){
+      spUploadStatus.textContent = 'Pick a chapter number and enter a name first.';
+      return;
+    }
+    spUploadStatus.textContent = '';
+    spPhotoInput.click();
+  });
+}
+
+if(spPhotoInput){
+  spPhotoInput.addEventListener('change', () => {
+    const file = spPhotoInput.files[0];
+    if(!file || !spCurrentMember || !spCurrentSubject) return;
+
+    // read the chapter number/name at upload time — these were
+    // already required (and unchanged since) by the button click
+    // handler above, so this just carries them through to the doc
+    const chapterNumber = Number(spChapterNumberSelect ? spChapterNumberSelect.value : 0) || null;
+    const chapterName = spChapterNameInput ? spChapterNameInput.value.trim() : '';
+    const label = chapterNumber ? `Chapter - ${chapterNumber} ${chapterName}`.trim() : chapterName;
+
+    if(!chapterNumber || !chapterName){
+      spUploadStatus.textContent = 'Pick a chapter number and enter a name first.';
+      spPhotoInput.value = '';
+      return;
+    }
+
+    spUploadStatus.textContent = 'Uploading...';
+
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.onload = () => {
+        // scale down to a reasonable max dimension so it stays well
+        // under Firestore's per-document size limit
+        const maxSide = 800;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+        db.collection('libraries').doc(spCurrentMember.uid)
+          .collection('photos').add({
+            subject: spCurrentSubject,
+            dataUrl: dataUrl,
+            chapterNumber: chapterNumber,
+            chapterName: chapterName,
+            label: label,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            spUploadStatus.textContent = '';
+            if(spChapterNumberSelect) spChapterNumberSelect.value = '';
+            if(spChapterNameInput) spChapterNameInput.value = '';
+          })
+          .catch(err => {
+            console.error('Could not upload photo:', err);
+            spUploadStatus.textContent = 'Upload failed — try again.';
+          });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    spPhotoInput.value = '';
+  });
+}
+
+/* =========================================================
+   FULLSCREEN PHOTO LIGHTBOX
+   ---------------------------------------------------------
+   Opened by clicking any thumbnail in the subject photos
+   grid. All photos for that subject render as stacked,
+   full-height slides inside a natively-scrollable container
+   (scroll-snap-type:y), so moving between photos is just a
+   normal continuous mouse-wheel scroll or touch swipe — the
+   browser handles it, nothing is intercepted or debounced.
+   Each photo can be zoomed independently (buttons, pinch, or
+   double-tap) and panned by dragging while zoomed in.
+   ========================================================= */
+const lightboxOverlay = document.getElementById('lightbox-overlay');
+const lightboxStage = document.getElementById('lightbox-stage');
+const lightboxCounter = document.getElementById('lightbox-counter');
+const lightboxClose = document.getElementById('lightbox-close');
+const lightboxZoomIn = document.getElementById('lightbox-zoom-in');
+const lightboxZoomOut = document.getElementById('lightbox-zoom-out');
+const lightboxZoomReset = document.getElementById('lightbox-zoom-reset');
+
+let lbPhotos = [];
+let lbSlideStates = []; // per-slide { scale, panX, panY } so each photo keeps its own zoom
+let lbActiveIndex = 0;
+const LB_MIN_SCALE = 1;
+const LB_MAX_SCALE = 4;
+
+function lbApplyTransform(img, state, animated){
+  img.classList.toggle('animated', !!animated);
+  img.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
+  img.closest('.lightbox-slide').classList.toggle('zoomed', state.scale > LB_MIN_SCALE);
+}
+
+function lbSetZoom(index, newScale, animated){
+  const state = lbSlideStates[index];
+  if(!state) return;
+  state.scale = Math.min(LB_MAX_SCALE, Math.max(LB_MIN_SCALE, newScale));
+  if(state.scale === LB_MIN_SCALE){ state.panX = 0; state.panY = 0; }
+  const img = lightboxStage.children[index]?.querySelector('img');
+  if(img) lbApplyTransform(img, state, animated);
+}
+
+function lbUpdateCounter(){
+  lightboxCounter.textContent = (lbActiveIndex + 1) + ' / ' + lbPhotos.length;
+}
+
+// Tracks which slide is currently centered in view (for the counter and
+// so zoom buttons act on the right photo) as the user scrolls naturally.
+const lbScrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting && entry.intersectionRatio > 0.6){
+      lbActiveIndex = Number(entry.target.dataset.index);
+      lbUpdateCounter();
+    }
+  });
+}, { root: null, threshold: [0.6] });
+
+function openLightbox(photos, index){
+  lbPhotos = photos;
+  lbSlideStates = photos.map(() => ({ scale: 1, panX: 0, panY: 0 }));
+  lbActiveIndex = index;
+
+  lightboxStage.innerHTML = '';
+  photos.forEach((photo, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'lightbox-slide';
+    slide.dataset.index = i;
+
+    const img = document.createElement('img');
+    img.src = photo.dataUrl;
+    img.alt = '';
+    slide.appendChild(img);
+
+    lightboxStage.appendChild(slide);
+    lbScrollObserver.observe(slide);
+    lbWireSlideGestures(slide, img, i);
+  });
+
+  lbUpdateCounter();
+  lightboxOverlay.classList.add('open');
+
+  // jump straight to the tapped photo, no animation/scroll-jank
+  requestAnimationFrame(() => {
+    lightboxStage.children[index]?.scrollIntoView({ block: 'center', behavior: 'auto' });
+  });
+}
+
+function closeLightbox(){
+  lightboxOverlay.classList.remove('open');
+  lbScrollObserver.disconnect();
+  lightboxStage.innerHTML = '';
+  lbPhotos = [];
+  lbSlideStates = [];
+}
+
+if(lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+if(lightboxZoomIn) lightboxZoomIn.addEventListener('click', () => lbSetZoom(lbActiveIndex, lbSlideStates[lbActiveIndex].scale + 0.5, true));
+if(lightboxZoomOut) lightboxZoomOut.addEventListener('click', () => lbSetZoom(lbActiveIndex, lbSlideStates[lbActiveIndex].scale - 0.5, true));
+if(lightboxZoomReset) lightboxZoomReset.addEventListener('click', () => lbSetZoom(lbActiveIndex, 1, true));
+
+// click the dark backdrop (not a slide/image) to close, like the other modals
+if(lightboxOverlay){
+  lightboxOverlay.addEventListener('click', (e) => {
+    if(e.target === lightboxOverlay) closeLightbox();
+  });
+}
+
+// per-slide gestures: double-tap/click to zoom, pinch to zoom, drag to pan
+// while zoomed. Vertical scrolling itself is left entirely to the browser
+// (scroll-snap on the stage) — nothing here calls preventDefault on a
+// plain one-finger vertical scroll/swipe.
+function lbWireSlideGestures(slide, img, index){
+  slide.addEventListener('dblclick', () => {
+    const state = lbSlideStates[index];
+    lbSetZoom(index, state.scale > LB_MIN_SCALE ? 1 : 2.5, true);
+  });
+
+  // Ctrl+wheel (or trackpad pinch, which browsers report as wheel+ctrlKey)
+  // zooms this photo. A plain wheel scroll is left untouched so it flows
+  // through as normal continuous page scrolling.
+  slide.addEventListener('wheel', (e) => {
+    if(!e.ctrlKey) return;
+    e.preventDefault();
+    const state = lbSlideStates[index];
+    lbSetZoom(index, state.scale - e.deltaY * 0.01, false);
+  }, { passive: false });
+
+  // drag-to-pan when zoomed in (mouse)
+  let dragging = false, startX = 0, startY = 0, panStartX = 0, panStartY = 0;
+  slide.addEventListener('mousedown', (e) => {
+    const state = lbSlideStates[index];
+    if(state.scale <= LB_MIN_SCALE) return;
+    dragging = true;
+    slide.classList.add('dragging');
+    startX = e.clientX; startY = e.clientY;
+    panStartX = state.panX; panStartY = state.panY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if(!dragging) return;
+    const state = lbSlideStates[index];
+    state.panX = panStartX + (e.clientX - startX);
+    state.panY = panStartY + (e.clientY - startY);
+    lbApplyTransform(img, state, false);
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+    slide.classList.remove('dragging');
+  });
+
+  // two-finger pinch to zoom; single-finger touch is left alone so the
+  // browser's native scroll/swipe handles moving between photos
+  let pinchStartDist = 0, pinchStartScale = 1;
+  slide.addEventListener('touchstart', (e) => {
+    if(e.touches.length === 2){
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStartDist = Math.hypot(dx, dy);
+      pinchStartScale = lbSlideStates[index].scale;
+    }
+  }, { passive: true });
+  slide.addEventListener('touchmove', (e) => {
+    if(e.touches.length === 2){
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      lbSetZoom(index, pinchStartScale * (dist / pinchStartDist), false);
+    }
+  }, { passive: false });
+}
+
+// keyboard: Escape closes, +/- zoom the current photo, arrows scroll to
+// the next/previous slide (still a real scroll, just triggered by key)
+document.addEventListener('keydown', (e) => {
+  if(!lightboxOverlay.classList.contains('open')) return;
+  if(e.key === 'Escape'){
+    closeLightbox();
+  } else if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){
+    lightboxStage.children[lbActiveIndex + 1]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  } else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){
+    lightboxStage.children[lbActiveIndex - 1]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  } else if(e.key === '+' || e.key === '='){
+    lbSetZoom(lbActiveIndex, lbSlideStates[lbActiveIndex].scale + 0.5, true);
+  } else if(e.key === '-'){
+    lbSetZoom(lbActiveIndex, lbSlideStates[lbActiveIndex].scale - 0.5, true);
+  }
+});
+
+/* =========================================================
+   EDIT PROFILE
+   ---------------------------------------------------------
+   Display name + avatar are saved to Firebase Auth (same
+   fields already used everywhere else on the site). Bio is
+   saved to Firestore under profiles/{uid}, since Auth has no
+   built-in bio field.
+   ========================================================= */
+const epForm = document.getElementById('edit-profile-form');
+const epAvatarPreview = document.getElementById('ep-avatar-preview');
+const epAvatarInput = document.getElementById('ep-avatar-input');
+const epAvatarBtn = document.getElementById('ep-avatar-btn');
+const epUsername = document.getElementById('ep-username');
+const epBio = document.getElementById('ep-bio');
+const epBioCount = document.getElementById('ep-bio-count');
+const epStatus = document.getElementById('ep-status');
+const epSaveBtn = document.getElementById('ep-save-btn');
+
+let epPendingAvatarDataUrl = null; // set only if the user picks a new image
+
+function epPopulateForm(){
+  const user = auth.currentUser;
+  if(!user) return;
+
+  epUsername.value = user.displayName || '';
+  epAvatarPreview.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.uid)}`;
+  epPendingAvatarDataUrl = null;
+
+  db.collection('profiles').doc(user.uid).get().then(doc => {
+    const data = doc.exists ? doc.data() : {};
+    epBio.value = data.bio || '';
+    epBioCount.textContent = epBio.value.length;
+    if(data.avatarDataUrl){
+      epAvatarPreview.src = data.avatarDataUrl;
+    }
+  }).catch(() => { /* no profile doc yet — leave defaults */ });
+}
+
+// populate whenever the Edit Profile tab is actually opened
+window.addEventListener('hashchange', () => {
+  if(location.hash === '#panel') epPopulateForm();
+});
+if(location.hash === '#panel') epPopulateForm();
+
+if(epBio){
+  epBio.addEventListener('input', () => {
+    epBioCount.textContent = epBio.value.length;
+  });
+}
+
+if(epAvatarBtn){
+  epAvatarBtn.addEventListener('click', () => epAvatarInput.click());
+}
+
+if(epAvatarInput){
+  epAvatarInput.addEventListener('change', () => {
+    const file = epAvatarInput.files[0];
+    if(!file) return;
+
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.onload = () => {
+        // resize down to a small square thumbnail so it stays well under
+        // Firebase Auth's practical photoURL size limits
+        const size = 128;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        const minSide = Math.min(img.width, img.height);
+        const sx = (img.width - minSide) / 2;
+        const sy = (img.height - minSide) / 2;
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        epPendingAvatarDataUrl = dataUrl;
+        epAvatarPreview.src = dataUrl;
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    epAvatarInput.value = '';
+  });
+}
+
+if(epForm){
+  epForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if(!user) return;
+
+    const newName = epUsername.value.trim();
+    if(!newName){
+      epStatus.textContent = 'Chat name cannot be empty.';
+      epStatus.className = 'ep-status error';
+      return;
+    }
+
+    epSaveBtn.disabled = true;
+    epStatus.textContent = 'Saving...';
+    epStatus.className = 'ep-status';
+
+    try {
+      // Force a fresh ID token before writing. The SDK normally handles this
+      // automatically, but a token that's gone stale while the tab was idle
+      // (or after the LOCAL->SESSION persistence fallback above) can cause
+      // accounts:update to reject the request with a 400 — refreshing here
+      // avoids that without changing anything else about the save flow.
+      await user.getIdToken(true);
+
+      await user.updateProfile({ displayName: newName });
+
+      // Only include avatarDataUrl in the write if a new image was picked —
+      // omitting the key (rather than sending it as null/undefined) means
+      // merge:true leaves the existing saved avatar untouched otherwise.
+      const firestoreUpdate = {
+        bio: epBio.value.trim(),
+        updatedAt: Date.now()
+      };
+      if(epPendingAvatarDataUrl){
+        firestoreUpdate.avatarDataUrl = epPendingAvatarDataUrl;
+      }
+      await db.collection('profiles').doc(user.uid).set(firestoreUpdate, { merge: true });
+
+      // reflect changes across the site immediately without a reload
+      document.getElementById('profile-name').textContent = newName;
+      if(epPendingAvatarDataUrl){
+        document.getElementById('profile-pic').src = epPendingAvatarDataUrl;
+      }
+      const sidebarPic = document.getElementById('ai-sidebar-pic');
+      const sidebarId  = document.getElementById('ai-sidebar-id');
+      if(sidebarPic) sidebarPic.src = document.getElementById('profile-pic').src;
+      if(sidebarId)  sidebarId.textContent = newName;
+      syncPersonalPanel(auth.currentUser);
+
+      epPendingAvatarDataUrl = null;
+      epStatus.textContent = 'Saved!';
+      epStatus.className = 'ep-status success';
+    } catch(err){
+      console.error('Profile save failed:', err);
+      // Show the specific Firebase error (e.g. auth/requires-recent-login)
+      // rather than a generic message, so the real cause is visible instead
+      // of hidden behind "try again".
+      let msg = 'Could not save changes — try again.';
+      if(err && err.code === 'auth/requires-recent-login'){
+        msg = 'This change needs a recent login. Please log out and back in, then try again.';
+      } else if(err && err.code){
+        msg = 'Could not save changes (' + err.code + ').';
+      } else if(err && err.message){
+        msg = 'Could not save changes: ' + err.message;
+      }
+      epStatus.textContent = msg;
+      epStatus.className = 'ep-status error';
+    } finally {
+      epSaveBtn.disabled = false;
+    }
+  });
+}
+
+/* =========================================================
+   PROFILE DROPDOWN
+   ========================================================= */
+const profileChip = document.getElementById('profile-chip');
+const profileDropdown = document.getElementById('profile-dropdown');
+
+function closeProfileDropdown(){
+  profileDropdown.classList.remove('open');
+  profileChip.classList.remove('open');
+}
+function toggleProfileDropdown(e){
+  e.stopPropagation();
+  const isOpen = profileDropdown.classList.toggle('open');
+  profileChip.classList.toggle('open', isOpen);
+}
+
+profileChip.addEventListener('click', toggleProfileDropdown);
+document.addEventListener('click', (e) => {
+  if(!profileChip.contains(e.target)) closeProfileDropdown();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeProfileDropdown();
+});
+
+document.getElementById('edit-profile-btn').addEventListener('click', () => {
+  closeProfileDropdown();
+  // TODO: wire up to an actual edit-profile section/modal
+  location.hash = '#panel';
+});
+document.getElementById('points-btn').addEventListener('click', () => {
+  closeProfileDropdown();
+  // TODO: wire up to an actual points section
+  location.hash = '#points';
+});
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  drawCaptcha();
+  runIntro();
+});
+</script>
+</body>
+</html>
