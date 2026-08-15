@@ -1272,19 +1272,31 @@ input{font-family:inherit;}
   min-height:1.2em;
 }
 
-/* --- subject photos modal --- */
+/* --- subject chapters (level 1) + chapter files (level 2) modals --- */
 .sp-upload-row{
   display:flex;
-  flex-direction:column;
-  gap:12px;
+  align-items:center;
+  gap:14px;
   margin-bottom:24px;
 }
 .sp-upload-row.hidden{ display:none; }
-.sp-chapter-fields{
+
+.sc-create-row{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:10px;
 }
+.sc-create-row.hidden{ display:none; }
+.sc-create-fields{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.sc-create-fields.hidden{ display:none; }
+.sc-revision-select{ min-width:220px; }
 .sp-chapter-select, .sp-chapter-name-input{
   padding:10px 12px;
   background:var(--bg-panel-2, #12121f);
@@ -1300,14 +1312,98 @@ input{font-family:inherit;}
   border-color:var(--neon-blue);
   box-shadow:0 0 10px rgba(34,211,255,0.25);
 }
-.sp-upload-action-row{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
 .sp-upload-status{
   font-size:0.8rem;
   color:var(--text-mid);
+  min-height:1.2em;
+  margin-bottom:14px;
+}
+
+.cf-back-btn{
+  display:block;
+  background:none;
+  border:none;
+  color:var(--neon-blue);
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  letter-spacing:0.5px;
+  padding:0;
+  margin-bottom:14px;
+  cursor:pointer;
+}
+.cf-back-btn:hover{ text-decoration:underline; }
+
+/* chapter folder tiles */
+.sc-folder-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+@media (max-width:520px){
+  .sc-folder-grid{ grid-template-columns:repeat(2, 1fr); }
+}
+.sc-folder-tile{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:20px 10px;
+  border:1px solid var(--line);
+  background:var(--bg-panel-2, #12121f);
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s;
+  text-align:center;
+}
+.sc-folder-tile:hover{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 12px rgba(34,211,255,0.25);
+}
+.sc-folder-plus{
+  border-style:dashed;
+  border-color:var(--neon-blue-dim, #0e6d85);
+  background:transparent;
+}
+.sc-folder-plus .sc-folder-icon{
+  color:var(--neon-blue);
+  font-size:2.2rem;
+  font-weight:700;
+}
+.sc-folder-plus:hover{
+  border-style:solid;
+  border-color:var(--neon-blue);
+}
+.sc-folder-icon{ font-size:1.8rem; line-height:1; }
+.sc-folder-label{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  color:var(--text-hi);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:100%;
+}
+.sc-folder-delete{
+  position:absolute;
+  top:6px; right:6px;
+  width:24px; height:24px;
+  border-radius:50%;
+  border:1px solid var(--neon-red);
+  background:rgba(5,5,11,0.75);
+  color:var(--neon-red);
+  font-size:0.9rem;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:box-shadow .2s, background .2s;
+}
+.sc-folder-delete:hover{
+  background:var(--neon-red);
+  color:#0a0a12;
+  box-shadow:0 0 10px rgba(255,45,85,0.5);
 }
 
 .sp-photo-grid{
@@ -1337,16 +1433,6 @@ input{font-family:inherit;}
   height:100%;
   object-fit:cover;
   display:block;
-}
-.sp-photo-label{
-  padding:6px 8px;
-  font-family:var(--font-mono);
-  font-size:0.68rem;
-  color:var(--text-hi);
-  background:rgba(12,12,22,0.85);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
 }
 .sp-photo-delete{
   position:absolute;
@@ -2356,32 +2442,55 @@ input{font-family:inherit;}
     </div>
   </div>
 
-  <!-- SUBJECT PHOTOS MODAL -->
-  <div class="modal-overlay" id="subject-photos-overlay">
-    <div class="modal-box wide" id="subject-photos-box">
-      <button type="button" class="modal-close" id="subject-photos-close" aria-label="Close">&times;</button>
-      <h3 class="modal-title" id="subject-photos-title"></h3>
+  <!-- LEVEL 1: CHAPTER FOLDERS for a subject -->
+  <div class="modal-overlay" id="subject-chapters-overlay">
+    <div class="modal-box wide" id="subject-chapters-box">
+      <button type="button" class="modal-close" id="subject-chapters-close" aria-label="Close">&times;</button>
+      <h3 class="modal-title" id="subject-chapters-title"></h3>
 
-      <div class="sp-upload-row hidden" id="sp-upload-row">
-        <div class="sp-chapter-fields">
-          <select id="sp-chapter-number" class="sp-chapter-select">
+      <div class="sc-create-row hidden" id="sc-create-row">
+        <div class="sc-create-fields" id="sc-create-normal">
+          <select id="sc-chapter-number" class="sp-chapter-select">
             <option value="">Chapter #</option>
           </select>
-          <input type="text" id="sp-chapter-name" class="sp-chapter-name-input" placeholder="Chapter name" maxlength="60">
+          <input type="text" id="sc-chapter-name" class="sp-chapter-name-input" placeholder="Chapter name" maxlength="60">
         </div>
-        <div class="sp-upload-action-row">
-          <input type="file" id="sp-photo-input" accept="image/*" hidden>
-          <button type="button" class="btn-ghost" id="sp-upload-btn">Add Chapter File</button>
-          <span class="sp-upload-status" id="sp-upload-status"></span>
+        <div class="sc-create-fields hidden" id="sc-create-revision">
+          <select id="sc-revision-subject" class="sp-chapter-select sc-revision-select">
+            <option value="">Select subject</option>
+          </select>
         </div>
+        <button type="button" class="btn-ghost" id="sc-create-btn">Create Chapter</button>
       </div>
+      <p class="sp-upload-status" id="sc-status"></p>
 
-      <div class="sp-photo-grid" id="sp-photo-grid">
-        <!-- photo thumbnails injected by JS -->
+      <div class="sc-folder-grid" id="sc-folder-grid">
+        <!-- chapter folder tiles injected by JS -->
       </div>
-      <p class="sp-empty-msg hidden" id="sp-empty-msg">No photos here yet.</p>
+      <p class="sp-empty-msg hidden" id="sc-empty-msg">No chapters here yet.</p>
     </div>
   </div>
+
+  <!-- LEVEL 2: FILES inside one chapter folder -->
+  <div class="modal-overlay" id="chapter-files-overlay">
+    <div class="modal-box wide" id="chapter-files-box">
+      <button type="button" class="modal-close" id="chapter-files-close" aria-label="Close">&times;</button>
+      <button type="button" class="cf-back-btn" id="chapter-files-back">&larr; Back to Chapters</button>
+      <h3 class="modal-title" id="chapter-files-title"></h3>
+
+      <div class="sp-upload-row hidden" id="cf-upload-row">
+        <input type="file" id="cf-photo-input" accept="image/*" hidden>
+        <button type="button" class="btn-ghost" id="cf-upload-btn">Upload File</button>
+        <span class="sp-upload-status" id="cf-upload-status"></span>
+      </div>
+
+      <div class="sp-photo-grid" id="cf-photo-grid">
+        <!-- photo thumbnails injected by JS -->
+      </div>
+      <p class="sp-empty-msg hidden" id="cf-empty-msg">No files in this chapter yet.</p>
+    </div>
+  </div>
+
 
   <!-- FULLSCREEN PHOTO LIGHTBOX -->
   <div class="lightbox-overlay" id="lightbox-overlay">
@@ -3354,7 +3463,8 @@ document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape'){
     closeDetailedRankings();
     if(lbMemberOverlay) lbMemberOverlay.classList.remove('open');
-    if(typeof closeSubjectPhotos === 'function') closeSubjectPhotos();
+    if(typeof closeChapterFiles === 'function') closeChapterFiles();
+    if(typeof closeSubjectChapters === 'function') closeSubjectChapters();
   }
 });
 
@@ -3695,7 +3805,7 @@ function buildSubjectsPanel(member){
     btn.type = 'button';
     btn.className = 'subject-btn';
     btn.textContent = subject;
-    btn.addEventListener('click', () => openSubjectPhotos(member, subject));
+    btn.addEventListener('click', () => openSubjectChapters(member, subject));
     panel.appendChild(btn);
   });
   return panel;
@@ -3851,55 +3961,306 @@ if(lbMemberOverlay){
 }
 
 /* =========================================================
-   SUBJECT PHOTOS MODAL
+   SUBJECT CHAPTERS (LEVEL 1) + CHAPTER FILES (LEVEL 2)
    ---------------------------------------------------------
-   Files live in Firestore at libraries/{uid}/photos/{photoId},
-   each doc: { subject, dataUrl, chapterNumber, chapterName,
-   label, createdAt }. Anyone can view a member's subject files;
-   only that member (auth.currentUser.uid === the library owner's
-   uid) can add or delete from it. Every file is labeled
-   "Chapter - {number} {name}" and listed sorted by chapter
-   number so it reads like a table of contents.
+   Chapter folders live at libraries/{uid}/chapters/{chapterId},
+   each doc: { subject, chapterNumber, chapterName, createdAt }.
+   Files inside a chapter live at libraries/{uid}/photos/{photoId},
+   each doc: { subject, chapterId, dataUrl, createdAt } — linked
+   to its folder via chapterId. Anyone can browse; only that
+   member (auth.currentUser.uid === the library owner's uid) can
+   create chapters, upload files, or delete either.
+
+   Most subjects use a plain "Chapter # + name" folder. The
+   "Revision Assesments" subject works differently: instead of a
+   chapter number, the owner picks WHICH subject the revision
+   covers, and the folder is auto-named "{Subject} Revision
+   Assesment" — a second one for the same subject becomes
+   "{Subject} Revision Assesment - 2", and so on.
 
    NOTE: this assumes Firestore security rules allow authenticated
-   reads on libraries -> photos subcollections, and writes only
-   where request.auth.uid matches the parent library's uid — that
-   needs to be set in the Firebase console alongside the existing
-   rules for 'profiles' and 'usernames'.
+   reads on libraries -> chapters/photos subcollections, and
+   writes only where request.auth.uid matches the parent
+   library's uid — same pattern as 'profiles' and 'usernames'.
    ========================================================= */
-const subjectPhotosOverlay = document.getElementById('subject-photos-overlay');
-const subjectPhotosClose = document.getElementById('subject-photos-close');
-const subjectPhotosTitle = document.getElementById('subject-photos-title');
-const spUploadRow = document.getElementById('sp-upload-row');
-const spChapterNumberSelect = document.getElementById('sp-chapter-number');
-const spChapterNameInput = document.getElementById('sp-chapter-name');
-const spPhotoInput = document.getElementById('sp-photo-input');
-const spUploadBtn = document.getElementById('sp-upload-btn');
-const spUploadStatus = document.getElementById('sp-upload-status');
-const spPhotoGrid = document.getElementById('sp-photo-grid');
-const spEmptyMsg = document.getElementById('sp-empty-msg');
 
-// fill the chapter dropdown with 1–28 once, on page load
-if(spChapterNumberSelect){
-  for(let i = 1; i <= 28; i++){
+// how many chapters show up in the dropdown for a given subject —
+// anything not listed here falls back to DEFAULT_CHAPTER_COUNT
+const CHAPTER_COUNT_BY_SUBJECT = {
+  'General Knowlegde': 50
+};
+const DEFAULT_CHAPTER_COUNT = 28;
+
+const REVISION_SUBJECT = 'Revision Assesments';
+const REVISION_LABEL = 'Revision Assesment';
+
+// --- Level 1: chapter folders for a subject ---
+const subjectChaptersOverlay = document.getElementById('subject-chapters-overlay');
+const subjectChaptersClose = document.getElementById('subject-chapters-close');
+const subjectChaptersTitle = document.getElementById('subject-chapters-title');
+const scCreateRow = document.getElementById('sc-create-row');
+const scCreateNormal = document.getElementById('sc-create-normal');
+const scCreateRevision = document.getElementById('sc-create-revision');
+const scChapterNumberSelect = document.getElementById('sc-chapter-number');
+const scChapterNameInput = document.getElementById('sc-chapter-name');
+const scRevisionSubjectSelect = document.getElementById('sc-revision-subject');
+const scCreateBtn = document.getElementById('sc-create-btn');
+const scStatus = document.getElementById('sc-status');
+const scFolderGrid = document.getElementById('sc-folder-grid');
+const scEmptyMsg = document.getElementById('sc-empty-msg');
+
+// fill the revision-assessment subject picker once, on page load —
+// every ordinary subject except "Revision Assesments" itself
+if(scRevisionSubjectSelect){
+  SUBJECTS_LIST.filter(s => s !== REVISION_SUBJECT).forEach(subj => {
+    const opt = document.createElement('option');
+    opt.value = subj;
+    opt.textContent = subj;
+    scRevisionSubjectSelect.appendChild(opt);
+  });
+}
+
+// rebuilds the Chapter # dropdown for whichever subject is
+// currently open, since different subjects allow different counts
+// (e.g. General Knowledge goes up to 50, everything else up to 28)
+function populateChapterNumberDropdown(subject){
+  if(!scChapterNumberSelect) return;
+  scChapterNumberSelect.innerHTML = '<option value="">Chapter #</option>';
+  const count = CHAPTER_COUNT_BY_SUBJECT[subject] || DEFAULT_CHAPTER_COUNT;
+  for(let i = 1; i <= count; i++){
     const opt = document.createElement('option');
     opt.value = String(i);
     opt.textContent = 'Chapter ' + i;
-    spChapterNumberSelect.appendChild(opt);
+    scChapterNumberSelect.appendChild(opt);
   }
 }
 
-let spUnsubscribe = null; // detaches the live listener when the modal closes
-let spCurrentMember = null;
-let spCurrentSubject = null;
+let scUnsubscribe = null; // detaches the live listener when the modal closes
+let scCurrentMember = null;
+let scCurrentSubject = null;
+let scCurrentChapters = []; // latest snapshot, used to count existing revision folders when naming a new one
 
-function renderSubjectPhotos(photos, isOwner){
-  spPhotoGrid.innerHTML = '';
+function renderChapterFolders(chapters, isOwner){
+  scFolderGrid.innerHTML = '';
+
+  const isRevision = scCurrentSubject === REVISION_SUBJECT;
+
+  // non-owners never see empty folders — a chapter only becomes
+  // visible to everyone else once at least one file has been
+  // uploaded into it (tracked via fileCount on the chapter doc)
+  const visibleChapters = isOwner ? chapters : chapters.filter(c => (c.fileCount || 0) > 0);
+
+  if(isOwner){
+    const plusTile = document.createElement('div');
+    plusTile.className = 'sc-folder-tile sc-folder-plus';
+    plusTile.addEventListener('click', () => {
+      scCreateRow.classList.toggle('hidden');
+      if(!scCreateRow.classList.contains('hidden')){
+        if(isRevision && scRevisionSubjectSelect) scRevisionSubjectSelect.focus();
+        else if(scChapterNumberSelect) scChapterNumberSelect.focus();
+      }
+    });
+    const plusIcon = document.createElement('div');
+    plusIcon.className = 'sc-folder-icon';
+    plusIcon.textContent = '+';
+    const plusLabel = document.createElement('div');
+    plusLabel.className = 'sc-folder-label';
+    plusLabel.textContent = isRevision ? 'New Assessment' : 'New Chapter';
+    plusTile.appendChild(plusIcon);
+    plusTile.appendChild(plusLabel);
+    scFolderGrid.appendChild(plusTile);
+  }
+
+  if(visibleChapters.length === 0){
+    scEmptyMsg.classList.remove('hidden');
+  } else {
+    scEmptyMsg.classList.add('hidden');
+  }
+
+  visibleChapters.forEach(chapter => {
+    const tile = document.createElement('div');
+    tile.className = 'sc-folder-tile';
+    tile.addEventListener('click', () => openChapterFiles(scCurrentMember, scCurrentSubject, chapter));
+
+    const icon = document.createElement('div');
+    icon.className = 'sc-folder-icon';
+    icon.textContent = '📁';
+
+    // Revision Assesments folders are already fully-named at
+    // creation time (e.g. "Hindi Revision Assesment - 2"), so just
+    // show that as-is. Every other subject uses "Chapter - N Name".
+    const label = document.createElement('div');
+    label.className = 'sc-folder-label';
+    label.textContent = isRevision
+      ? (chapter.chapterName || '')
+      : `Chapter - ${chapter.chapterNumber} ${chapter.chapterName || ''}`.trim();
+
+    tile.appendChild(icon);
+    tile.appendChild(label);
+
+    if(isOwner){
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'sc-folder-delete';
+      delBtn.setAttribute('aria-label', 'Delete chapter');
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if(!confirm(`Delete "${label.textContent}" and every file inside it?`)) return;
+        try {
+          // delete every file inside this chapter first, then the
+          // folder doc itself, so nothing is left orphaned
+          const filesSnap = await db.collection('libraries').doc(scCurrentMember.uid)
+            .collection('photos').where('chapterId', '==', chapter.id).get();
+          const batch = db.batch();
+          filesSnap.forEach(doc => batch.delete(doc.ref));
+          batch.delete(db.collection('libraries').doc(scCurrentMember.uid).collection('chapters').doc(chapter.id));
+          await batch.commit();
+        } catch (err) {
+          console.error('Could not delete chapter:', err);
+          scStatus.textContent = 'Could not delete that chapter.';
+        }
+      });
+      tile.appendChild(delBtn);
+    }
+
+    scFolderGrid.appendChild(tile);
+  });
+}
+
+function openSubjectChapters(member, subject){
+  scCurrentMember = member;
+  scCurrentSubject = subject;
+
+  const isOwner = !!(auth.currentUser && auth.currentUser.uid === member.uid);
+  const isRevision = subject === REVISION_SUBJECT;
+
+  subjectChaptersTitle.textContent = member.username + "'s Library — " + subject;
+  scCreateRow.classList.add('hidden'); // stays tucked away until the + tile is clicked
+  scCreateNormal.classList.toggle('hidden', isRevision);
+  scCreateRevision.classList.toggle('hidden', !isRevision);
+  scStatus.textContent = '';
+  if(!isRevision) populateChapterNumberDropdown(subject);
+  if(scChapterNumberSelect) scChapterNumberSelect.value = '';
+  if(scChapterNameInput) scChapterNameInput.value = '';
+  if(scRevisionSubjectSelect) scRevisionSubjectSelect.value = '';
+  scFolderGrid.innerHTML = '';
+  scEmptyMsg.classList.add('hidden');
+
+  if(scUnsubscribe) scUnsubscribe();
+  scUnsubscribe = db.collection('libraries').doc(member.uid)
+    .collection('chapters')
+    .where('subject', '==', subject)
+    .onSnapshot(snapshot => {
+      const chapters = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+      scCurrentChapters = chapters;
+      renderChapterFolders(chapters, isOwner);
+    }, err => {
+      console.error('Could not load chapters:', err);
+      scEmptyMsg.textContent = 'Could not load chapters — try again later.';
+      scEmptyMsg.classList.remove('hidden');
+    });
+
+  subjectChaptersOverlay.classList.add('open');
+}
+
+function closeSubjectChapters(){
+  subjectChaptersOverlay.classList.remove('open');
+  if(scUnsubscribe){ scUnsubscribe(); scUnsubscribe = null; }
+  scCurrentChapters = [];
+  scCurrentMember = null;
+  scCurrentSubject = null;
+}
+
+if(subjectChaptersClose){
+  subjectChaptersClose.addEventListener('click', closeSubjectChapters);
+}
+if(subjectChaptersOverlay){
+  subjectChaptersOverlay.addEventListener('click', (e) => {
+    if(e.target === subjectChaptersOverlay) closeSubjectChapters();
+  });
+}
+
+if(scCreateBtn){
+  scCreateBtn.addEventListener('click', async () => {
+    if(!scCurrentMember || !scCurrentSubject) return;
+    const isRevision = scCurrentSubject === REVISION_SUBJECT;
+
+    let chapterNumber, chapterName;
+
+    if(isRevision){
+      const pickedSubject = scRevisionSubjectSelect ? scRevisionSubjectSelect.value : '';
+      if(!pickedSubject){
+        scStatus.textContent = 'Pick a subject first.';
+        return;
+      }
+      // "Hindi Revision Assesment", then "Hindi Revision Assesment - 2",
+      // "- 3", etc. — counted off however many already exist for
+      // this subject among the chapters currently loaded for this page
+      const baseLabel = `${pickedSubject} ${REVISION_LABEL}`;
+      const existingCount = scCurrentChapters.filter(c =>
+        c.chapterName === baseLabel || (c.chapterName || '').startsWith(baseLabel + ' - ')
+      ).length;
+      chapterName = existingCount === 0 ? baseLabel : `${baseLabel} - ${existingCount + 1}`;
+      chapterNumber = existingCount + 1; // just used for sort order / uniqueness, not shown
+    } else {
+      chapterNumber = Number(scChapterNumberSelect ? scChapterNumberSelect.value : 0) || null;
+      chapterName = scChapterNameInput ? scChapterNameInput.value.trim() : '';
+
+      if(!chapterNumber || !chapterName){
+        scStatus.textContent = 'Pick a chapter number and enter a name first.';
+        return;
+      }
+    }
+
+    scStatus.textContent = 'Creating...';
+    try {
+      await db.collection('libraries').doc(scCurrentMember.uid)
+        .collection('chapters').add({
+          subject: scCurrentSubject,
+          chapterNumber: chapterNumber,
+          chapterName: chapterName,
+          fileCount: 0, // stays 0 until a file is uploaded into it — see renderChapterFolders' visibility filter
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      scStatus.textContent = '';
+      if(scChapterNumberSelect) scChapterNumberSelect.value = '';
+      if(scChapterNameInput) scChapterNameInput.value = '';
+      if(scRevisionSubjectSelect) scRevisionSubjectSelect.value = '';
+      scCreateRow.classList.add('hidden');
+    } catch (err) {
+      console.error('Could not create chapter:', err);
+      scStatus.textContent = 'Could not create that chapter — try again.';
+    }
+  });
+}
+
+// --- Level 2: files inside one chapter folder ---
+const chapterFilesOverlay = document.getElementById('chapter-files-overlay');
+const chapterFilesClose = document.getElementById('chapter-files-close');
+const chapterFilesBack = document.getElementById('chapter-files-back');
+const chapterFilesTitle = document.getElementById('chapter-files-title');
+const cfUploadRow = document.getElementById('cf-upload-row');
+const cfPhotoInput = document.getElementById('cf-photo-input');
+const cfUploadBtn = document.getElementById('cf-upload-btn');
+const cfUploadStatus = document.getElementById('cf-upload-status');
+const cfPhotoGrid = document.getElementById('cf-photo-grid');
+const cfEmptyMsg = document.getElementById('cf-empty-msg');
+
+let cfUnsubscribe = null;
+let cfCurrentMember = null;
+let cfCurrentSubject = null;
+let cfCurrentChapter = null;
+
+function renderChapterFiles(photos, isOwner){
+  cfPhotoGrid.innerHTML = '';
 
   if(photos.length === 0){
-    spEmptyMsg.classList.remove('hidden');
+    cfEmptyMsg.classList.remove('hidden');
   } else {
-    spEmptyMsg.classList.add('hidden');
+    cfEmptyMsg.classList.add('hidden');
   }
 
   photos.forEach((photo, index) => {
@@ -3911,7 +4272,7 @@ function renderSubjectPhotos(photos, isOwner){
 
     const img = document.createElement('img');
     img.src = photo.dataUrl;
-    img.alt = photo.label || '';
+    img.alt = '';
     imgWrap.addEventListener('click', () => openLightbox(photos, index));
     imgWrap.appendChild(img);
 
@@ -3923,112 +4284,91 @@ function renderSubjectPhotos(photos, isOwner){
       delBtn.textContent = '×';
       delBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        db.collection('libraries').doc(spCurrentMember.uid)
+        const chapterId = photo.chapterId;
+        db.collection('libraries').doc(cfCurrentMember.uid)
           .collection('photos').doc(photo.id).delete()
+          .then(() => {
+            if(chapterId){
+              return db.collection('libraries').doc(cfCurrentMember.uid)
+                .collection('chapters').doc(chapterId)
+                .update({ fileCount: firebase.firestore.FieldValue.increment(-1) });
+            }
+          })
           .catch(err => console.error('Could not delete file:', err));
       });
       imgWrap.appendChild(delBtn);
     }
 
     item.appendChild(imgWrap);
-
-    // label reads "Chapter - {number} {name}" — falls back to
-    // "Untitled" for any older entries added before this existed
-    const label = document.createElement('div');
-    label.className = 'sp-photo-label';
-    label.textContent = photo.label ||
-      (photo.chapterNumber ? `Chapter - ${photo.chapterNumber} ${photo.chapterName || ''}`.trim() : 'Untitled');
-    item.appendChild(label);
-
-    spPhotoGrid.appendChild(item);
+    cfPhotoGrid.appendChild(item);
   });
 }
 
-function openSubjectPhotos(member, subject){
-  spCurrentMember = member;
-  spCurrentSubject = subject;
+function openChapterFiles(member, subject, chapter){
+  cfCurrentMember = member;
+  cfCurrentSubject = subject;
+  cfCurrentChapter = chapter;
 
   const isOwner = !!(auth.currentUser && auth.currentUser.uid === member.uid);
 
-  subjectPhotosTitle.textContent = member.username + "'s Library — " + subject;
-  spUploadRow.classList.toggle('hidden', !isOwner);
-  spUploadStatus.textContent = '';
-  if(spChapterNumberSelect) spChapterNumberSelect.value = '';
-  if(spChapterNameInput) spChapterNameInput.value = '';
-  spPhotoGrid.innerHTML = '';
-  spEmptyMsg.classList.add('hidden');
+  chapterFilesTitle.textContent = member.username + "'s Library — " + subject +
+    ` — Chapter - ${chapter.chapterNumber} ${chapter.chapterName || ''}`.trim();
+  cfUploadRow.classList.toggle('hidden', !isOwner);
+  cfUploadStatus.textContent = '';
+  cfPhotoGrid.innerHTML = '';
+  cfEmptyMsg.classList.add('hidden');
 
-  if(spUnsubscribe) spUnsubscribe();
-  spUnsubscribe = db.collection('libraries').doc(member.uid)
+  if(cfUnsubscribe) cfUnsubscribe();
+  cfUnsubscribe = db.collection('libraries').doc(member.uid)
     .collection('photos')
-    .where('subject', '==', subject)
+    .where('chapterId', '==', chapter.id)
     .onSnapshot(snapshot => {
       const photos = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => {
-          const chapterDiff = (a.chapterNumber || 0) - (b.chapterNumber || 0);
-          if(chapterDiff !== 0) return chapterDiff;
-          return (a.createdAt?.toMillis?.() || 0) - (b.createdAt?.toMillis?.() || 0);
-        });
-      renderSubjectPhotos(photos, isOwner);
+        .sort((a, b) => (a.createdAt?.toMillis?.() || 0) - (b.createdAt?.toMillis?.() || 0));
+      renderChapterFiles(photos, isOwner);
     }, err => {
-      console.error('Could not load photos:', err);
-      spEmptyMsg.textContent = 'Could not load photos — try again later.';
-      spEmptyMsg.classList.remove('hidden');
+      console.error('Could not load files:', err);
+      cfEmptyMsg.textContent = 'Could not load files — try again later.';
+      cfEmptyMsg.classList.remove('hidden');
     });
 
-  subjectPhotosOverlay.classList.add('open');
+  // stack level 2 on top of level 1 rather than replacing it, so
+  // "Back to Chapters" just needs to close this overlay
+  chapterFilesOverlay.classList.add('open');
 }
 
-function closeSubjectPhotos(){
-  subjectPhotosOverlay.classList.remove('open');
-  if(spUnsubscribe){ spUnsubscribe(); spUnsubscribe = null; }
-  spCurrentMember = null;
-  spCurrentSubject = null;
+function closeChapterFiles(){
+  chapterFilesOverlay.classList.remove('open');
+  if(cfUnsubscribe){ cfUnsubscribe(); cfUnsubscribe = null; }
+  cfCurrentMember = null;
+  cfCurrentSubject = null;
+  cfCurrentChapter = null;
   if(typeof closeLightbox === 'function') closeLightbox();
 }
 
-if(subjectPhotosClose){
-  subjectPhotosClose.addEventListener('click', closeSubjectPhotos);
+if(chapterFilesClose){
+  chapterFilesClose.addEventListener('click', closeChapterFiles);
 }
-if(subjectPhotosOverlay){
-  subjectPhotosOverlay.addEventListener('click', (e) => {
-    if(e.target === subjectPhotosOverlay) closeSubjectPhotos();
+if(chapterFilesBack){
+  chapterFilesBack.addEventListener('click', closeChapterFiles);
+}
+if(chapterFilesOverlay){
+  chapterFilesOverlay.addEventListener('click', (e) => {
+    if(e.target === chapterFilesOverlay) closeChapterFiles();
   });
 }
 
-if(spUploadBtn){
-  spUploadBtn.addEventListener('click', () => {
-    const num = spChapterNumberSelect ? spChapterNumberSelect.value : '';
-    const name = spChapterNameInput ? spChapterNameInput.value.trim() : '';
-    if(!num || !name){
-      spUploadStatus.textContent = 'Pick a chapter number and enter a name first.';
-      return;
-    }
-    spUploadStatus.textContent = '';
-    spPhotoInput.click();
-  });
+if(cfUploadBtn){
+  cfUploadBtn.addEventListener('click', () => cfPhotoInput.click());
 }
 
-if(spPhotoInput){
-  spPhotoInput.addEventListener('change', () => {
-    const file = spPhotoInput.files[0];
-    if(!file || !spCurrentMember || !spCurrentSubject) return;
+if(cfPhotoInput){
+  cfPhotoInput.addEventListener('change', () => {
+    const file = cfPhotoInput.files[0];
+    if(!file || !cfCurrentMember || !cfCurrentSubject || !cfCurrentChapter) return;
 
-    // read the chapter number/name at upload time — these were
-    // already required (and unchanged since) by the button click
-    // handler above, so this just carries them through to the doc
-    const chapterNumber = Number(spChapterNumberSelect ? spChapterNumberSelect.value : 0) || null;
-    const chapterName = spChapterNameInput ? spChapterNameInput.value.trim() : '';
-    const label = chapterNumber ? `Chapter - ${chapterNumber} ${chapterName}`.trim() : chapterName;
-
-    if(!chapterNumber || !chapterName){
-      spUploadStatus.textContent = 'Pick a chapter number and enter a name first.';
-      spPhotoInput.value = '';
-      return;
-    }
-
-    spUploadStatus.textContent = 'Uploading...';
+    cfUploadStatus.textContent = 'Uploading...';
 
     const img = new Image();
     const reader = new FileReader();
@@ -4048,29 +4388,30 @@ if(spPhotoInput){
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
 
-        db.collection('libraries').doc(spCurrentMember.uid)
+        db.collection('libraries').doc(cfCurrentMember.uid)
           .collection('photos').add({
-            subject: spCurrentSubject,
+            subject: cfCurrentSubject,
+            chapterId: cfCurrentChapter.id,
             dataUrl: dataUrl,
-            chapterNumber: chapterNumber,
-            chapterName: chapterName,
-            label: label,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           })
           .then(() => {
-            spUploadStatus.textContent = '';
-            if(spChapterNumberSelect) spChapterNumberSelect.value = '';
-            if(spChapterNameInput) spChapterNameInput.value = '';
+            cfUploadStatus.textContent = '';
+            // this is what flips the folder from "owner-only, empty"
+            // to visible for everyone else browsing the library
+            return db.collection('libraries').doc(cfCurrentMember.uid)
+              .collection('chapters').doc(cfCurrentChapter.id)
+              .update({ fileCount: firebase.firestore.FieldValue.increment(1) });
           })
           .catch(err => {
-            console.error('Could not upload photo:', err);
-            spUploadStatus.textContent = 'Upload failed — try again.';
+            console.error('Could not upload file:', err);
+            cfUploadStatus.textContent = 'Upload failed — try again.';
           });
       };
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
-    spPhotoInput.value = '';
+    cfPhotoInput.value = '';
   });
 }
 
