@@ -1333,6 +1333,36 @@ input{font-family:inherit;}
 }
 .cf-back-btn:hover{ text-decoration:underline; }
 
+.cf-choice-box{
+  max-width:340px;
+  text-align:center;
+}
+.cf-choice-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.cf-choice-btn{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  padding:22px 16px;
+  background:var(--bg-panel-2, #12121f);
+  border:1px solid var(--line);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.95rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s;
+}
+.cf-choice-btn:hover{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 14px rgba(34,211,255,0.25);
+}
+.cf-choice-icon{ font-size:2rem; line-height:1; }
+
 /* chapter folder tiles */
 .sc-folder-grid{
   display:grid;
@@ -1723,6 +1753,79 @@ input{font-family:inherit;}
   text-align:center;
   color:var(--text-mid);
   font-size:0.85rem;
+}
+
+/* --- top-3 medal styling (gold/silver/bronze), MCTiers-style --- */
+.lb-col-division.lb-rank-badge{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-display);
+  font-weight:900;
+  font-style:italic;
+  font-size:1.05rem;
+  border-radius:6px;
+  padding:10px 4px;
+}
+.lb-rank-badge.lb-rank-1{
+  background:linear-gradient(135deg, #ffe08a, #c8890b);
+  color:#241800;
+  box-shadow:0 0 14px rgba(255,196,64,0.35);
+}
+.lb-rank-badge.lb-rank-2{
+  background:linear-gradient(135deg, #eaeaea, #9a9a9a);
+  color:#1a1a1a;
+  box-shadow:0 0 14px rgba(200,200,200,0.25);
+}
+.lb-rank-badge.lb-rank-3{
+  background:linear-gradient(135deg, #e79a54, #a85a1d);
+  color:#241400;
+  box-shadow:0 0 14px rgba(210,130,50,0.3);
+}
+.lb-col-image.lb-rank-1 img{ border:2px solid #f0b03a; }
+.lb-col-image.lb-rank-2 img{ border:2px solid #c0c0c0; }
+.lb-col-image.lb-rank-3 img{ border:2px solid #c97a34; }
+
+/* --- custom member name colors (owner-assigned) --- */
+.lb-col-username.lb-username-rainbow{
+  background:linear-gradient(90deg, #ff3b3b, #ff9d3b, #f4ff3b, #3bff6a, #3bd4ff, #6a3bff, #ff3bd4, #ff3b3b);
+  background-size:300% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:lb-rainbow-shift 3.5s linear infinite;
+}
+@keyframes lb-rainbow-shift{
+  0%{ background-position:100% 50%; }
+  100%{ background-position:0% 50%; }
+}
+
+/* --- owner panel: member color swatch picker --- */
+.lb-color-swatch-grid{
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:8px;
+  margin-top:14px;
+  max-width:340px;
+}
+.lb-color-swatch{
+  width:100%;
+  aspect-ratio:1;
+  border-radius:6px;
+  border:2px solid var(--line);
+  cursor:pointer;
+  transition:transform .15s, border-color .15s;
+  padding:0;
+}
+.lb-color-swatch:hover{ transform:scale(1.1); }
+.lb-color-swatch.selected{
+  border-color:#fff;
+  box-shadow:0 0 10px rgba(255,255,255,0.6);
+}
+.lb-color-swatch.lb-color-rgb{
+  background:linear-gradient(90deg, #ff3b3b, #ff9d3b, #f4ff3b, #3bff6a, #3bd4ff, #6a3bff, #ff3bd4);
+  background-size:300% 100%;
+  animation:lb-rainbow-shift 3s linear infinite;
 }
 
 @media (max-width:640px){
@@ -2132,6 +2235,7 @@ input{font-family:inherit;}
           <a href="#bank">Bank Account</a>
           <a href="#personal-panel">Personal Panel</a>
           <a href="#chats">XtremeChats</a>
+          <a href="#personal-panel" id="nav-manage-link" class="hidden">Manage</a>
         </div>
       </li>
     </ul>
@@ -2390,6 +2494,63 @@ input{font-family:inherit;}
           in a browser-side page — but everything visible and every
           login path is fully cut off.
         </p>
+
+        <h3 class="pp-admin-title" style="margin-top:32px;">Leaderboard Membership</h3>
+        <p class="ep-status" id="lb-membership-message"></p>
+        <label class="ep-label" for="lb-user-select">User</label>
+        <select id="lb-user-select" class="ep-input sp-chapter-select" style="width:100%;">
+          <option value="">Select a user…</option>
+        </select>
+        <div class="ep-actions">
+          <button type="button" class="btn-solid" id="lb-membership-toggle-btn" disabled>Select a user first</button>
+        </div>
+
+        <h3 class="pp-admin-title" style="margin-top:32px;">Adjust Points</h3>
+        <p class="ep-status" id="lb-points-message"></p>
+        <label class="ep-label" for="lb-points-user-select">User (must already be on the leaderboard)</label>
+        <select id="lb-points-user-select" class="ep-input sp-chapter-select" style="width:100%;">
+          <option value="">Select a user…</option>
+        </select>
+
+        <label class="ep-label" for="lb-points-category" style="margin-top:14px;">Points Type</label>
+        <select id="lb-points-category" class="ep-input sp-chapter-select" style="width:100%;">
+          <option value="General Points">General Points</option>
+        </select>
+
+        <label class="ep-label" for="lb-points-amount" style="margin-top:14px;">Amount</label>
+        <input type="number" id="lb-points-amount" class="ep-input" min="1" step="1" value="1">
+
+        <div class="ep-actions" style="gap:10px;">
+          <button type="button" class="btn-solid" id="lb-points-add-btn">Add Points</button>
+          <button type="button" class="btn-ghost" id="lb-points-remove-btn">Remove Points</button>
+        </div>
+
+        <p class="pp-admin-note">
+          Adding someone to the leaderboard starts them at 0 points.
+          From then on, they'll pick up +2 points automatically for
+          each day that's passed — that catch-up runs the next time
+          they (or you) open the site, since there's no server running
+          in the background to do it on a fixed schedule. "Adjust
+          Points" is for manual awards/penalties on top of that, and
+          gets logged under whichever points type you pick.
+        </p>
+
+        <h3 class="pp-admin-title" style="margin-top:32px;">Member Color</h3>
+        <p class="ep-status" id="lb-color-message"></p>
+        <label class="ep-label" for="lb-color-user-select">User (must already be on the leaderboard)</label>
+        <select id="lb-color-user-select" class="ep-input sp-chapter-select" style="width:100%;">
+          <option value="">Select a user…</option>
+        </select>
+
+        <div class="lb-color-swatch-grid" id="lb-color-swatch-grid">
+          <!-- 20 preset color swatches + 1 animated RGB swatch injected by JS -->
+        </div>
+
+        <p class="pp-admin-note">
+          This colors that member's username wherever it shows on the
+          Leaderboard — pick any of the 20 preset colors, or the RGB
+          swatch for an animated rainbow name that shifts left to right.
+        </p>
       </div>
     </div>
   </section>
@@ -2479,8 +2640,9 @@ input{font-family:inherit;}
       <h3 class="modal-title" id="chapter-files-title"></h3>
 
       <div class="sp-upload-row hidden" id="cf-upload-row">
-        <input type="file" id="cf-photo-input" accept="image/*" hidden>
-        <button type="button" class="btn-ghost" id="cf-upload-btn">Upload File</button>
+        <input type="file" id="cf-photo-input-gallery" accept="image/*" multiple hidden>
+        <input type="file" id="cf-photo-input-camera" accept="image/*" capture="environment" hidden>
+        <button type="button" class="btn-ghost" id="cf-upload-btn">Upload Files</button>
         <span class="sp-upload-status" id="cf-upload-status"></span>
       </div>
 
@@ -2488,6 +2650,24 @@ input{font-family:inherit;}
         <!-- photo thumbnails injected by JS -->
       </div>
       <p class="sp-empty-msg hidden" id="cf-empty-msg">No files in this chapter yet.</p>
+    </div>
+  </div>
+
+  <!-- small choice panel: folder (multi-select) vs camera -->
+  <div class="modal-overlay" id="cf-upload-choice-overlay">
+    <div class="modal-box cf-choice-box" id="cf-upload-choice-box">
+      <button type="button" class="modal-close" id="cf-upload-choice-close" aria-label="Close">&times;</button>
+      <h3 class="modal-title" style="margin-bottom:22px;">Add Files</h3>
+      <div class="cf-choice-buttons">
+        <button type="button" class="cf-choice-btn" id="cf-choice-folder-btn">
+          <span class="cf-choice-icon">📁</span>
+          <span>Choose from Folder</span>
+        </button>
+        <button type="button" class="cf-choice-btn" id="cf-choice-camera-btn">
+          <span class="cf-choice-icon">📷</span>
+          <span>Use Camera</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -3357,6 +3537,34 @@ const RANK_TIER_DATA = {
   // pro, premium, platinum — added later
 };
 
+// Flattened, highest-points-first list of every "normal" tier rank,
+// used to look up what rank a given point total currently earns.
+// Point-based leaderboard entries derive their rank/color from this
+// instead of storing it directly, so bumping RANK_TIER_DATA above
+// automatically updates everyone's displayed rank too.
+const ALL_RANKS_FLAT = RANK_TIER_DATA.normal.groups
+  .flatMap(g => g.ranks)
+  .slice()
+  .sort((a, b) => b.points - a.points);
+
+function rankForPoints(points){
+  for(const r of ALL_RANKS_FLAT){
+    if((points || 0) >= r.points) return r;
+  }
+  return ALL_RANKS_FLAT[ALL_RANKS_FLAT.length - 1];
+}
+
+// the point "types" available in the Adjust Points dropdown — pulled
+// from every unique special-points label already used across the
+// rank ladder above, so it always matches what's shown elsewhere on
+// the site, plus a catch-all "General Points" for anything else
+const POINTS_CATEGORIES = ['General Points', ...new Set(
+  RANK_TIER_DATA.normal.groups
+    .flatMap(g => g.ranks)
+    .flatMap(r => r.special || [])
+    .map(s => s.label)
+)];
+
 function renderRankRow(rank){
   const row = document.createElement('div');
   row.className = 'rank-row';
@@ -3478,45 +3686,52 @@ document.querySelectorAll('.modal-tier-btn').forEach(btn => {
 /* =========================================================
    LEADERBOARD
    ---------------------------------------------------------
-   PLACEHOLDER DATA — this is mock/example data so the layout
-   is testable. Replace LEADERBOARD_DATA with a real Firestore
-   query (e.g. a 'leaderboard' or 'users' collection ordered by
-   points) once that's ready.
+   Backed by Firestore now: leaderboard/{uid} holds one doc per
+   member who's actually on the leaderboard — { username, points,
+   categories: { [pointsType]: subtotal }, joinedAt,
+   lastAccrualDate }. rankName/rankColor aren't stored; they're
+   derived live from `points` via rankForPoints() above, so the
+   whole leaderboard re-ranks itself automatically if RANK_TIER_DATA
+   ever changes. currentLeaderboardEntries always holds the latest
+   snapshot, used to populate the owner panel's user dropdowns.
    ========================================================= */
-const LEADERBOARD_DATA = [
-  {
-    username: 'SaumyaXtreme',
-    rankName: 'Owner',
-    rankColor: 'rk-red',
-    points: 300,
-    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=SaumyaXtreme',
-    breakdown: [
-      { label: 'Helping Points', value: 60 },
-      { label: 'Disciplinary Points', value: 20 },
-      { label: 'Glitched Points', value: 20 },
-      { label: 'Management Points', value: 20 },
-      { label: 'Rankinary Points', value: 20 },
-      { label: 'CAO Points', value: 30 },
-      { label: 'Leadership Points', value: 50 },
-    ]
-  },
-  {
-    username: 'ExampleMember2',
-    rankName: 'Glarient',
-    rankColor: 'rk-purple',
-    points: 270,
-    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=ExampleMember2',
-    breakdown: [{ label: 'Management Points', value: 16 }]
-  },
-  {
-    username: 'ExampleMember3',
-    rankName: 'Tank',
-    rankColor: 'rk-blue',
-    points: 180,
-    image: 'https://api.dicebear.com/7.x/identicon/svg?seed=ExampleMember3',
-    breakdown: []
-  },
-];
+let currentLeaderboardEntries = [];
+
+db.collection('leaderboard').onSnapshot(async (snapshot) => {
+  const raw = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+
+  const entries = await Promise.all(raw.map(async (e) => {
+    let avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(e.uid)}`;
+    try {
+      const profileDoc = await db.collection('profiles').doc(e.uid).get();
+      if(profileDoc.exists && profileDoc.data().avatarDataUrl){
+        avatarUrl = profileDoc.data().avatarDataUrl;
+      }
+    } catch (err) { /* fall back to identicon */ }
+
+    const rank = rankForPoints(e.points || 0);
+    const breakdown = Object.entries(e.categories || {})
+      .filter(([, value]) => value)
+      .map(([label, value]) => ({ label, value }));
+
+    return {
+      uid: e.uid,
+      username: e.username,
+      points: e.points || 0,
+      image: avatarUrl,
+      rankName: rank.name,
+      rankColor: rank.color,
+      nameColor: e.nameColor || null,
+      breakdown
+    };
+  }));
+
+  currentLeaderboardEntries = entries;
+  renderLeaderboard(entries);
+  populateLeaderboardDropdowns();
+}, err => {
+  console.error('Could not load leaderboard:', err);
+});
 
 /* =========================================================
    PERSONAL PANEL
@@ -3527,7 +3742,7 @@ const LEADERBOARD_DATA = [
    is just a summary view. Called on login and whenever the
    avatar/name changes.
    ========================================================= */
-function syncPersonalPanel(user){
+async function syncPersonalPanel(user){
   if(!user) return;
   const ppAvatar = document.getElementById('pp-avatar');
   const ppName = document.getElementById('pp-name');
@@ -3539,22 +3754,123 @@ function syncPersonalPanel(user){
   if(ppName) ppName.textContent = user.displayName || 'Member';
   if(ppEmail) ppEmail.textContent = user.email || '';
 
-  const entry = LEADERBOARD_DATA.find(m =>
-    m.username.toLowerCase() === (user.displayName || '').toLowerCase()
-  );
-  if(ppRank) ppRank.textContent = entry ? entry.rankName : '—';
-  if(ppPoints) ppPoints.textContent = entry ? entry.points : '—';
+  if(ppRank) ppRank.textContent = '—';
+  if(ppPoints) ppPoints.textContent = '—';
+
+  try {
+    const lbRef = db.collection('leaderboard').doc(user.uid);
+    const lbSnap = await lbRef.get();
+
+    if(lbSnap.exists){
+      let data = lbSnap.data();
+
+      // self-accrual catch-up: +2 points for every full day that's
+      // passed since this account's leaderboard doc last accrued.
+      // Each member's own account is what's allowed to write this
+      // (see the Firestore rules note near openSubjectChapters/the
+      // leaderboard admin panel below) — it only ever increases their
+      // own points, by a fixed +2/day, capped per visit.
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if(!data.lastAccrualDate){
+        await lbRef.update({ lastAccrualDate: todayStr });
+        data.lastAccrualDate = todayStr;
+      } else if(data.lastAccrualDate !== todayStr){
+        const last = new Date(data.lastAccrualDate + 'T00:00:00');
+        const today = new Date(todayStr + 'T00:00:00');
+        const daysElapsed = Math.max(0, Math.round((today - last) / 86400000));
+        if(daysElapsed > 0){
+          const bonus = daysElapsed * 2;
+          await lbRef.update({
+            points: firebase.firestore.FieldValue.increment(bonus),
+            lastAccrualDate: todayStr
+          });
+          data.points = (data.points || 0) + bonus;
+          data.lastAccrualDate = todayStr;
+        }
+      }
+
+      const rank = rankForPoints(data.points || 0);
+      if(ppRank) ppRank.textContent = rank.name;
+      if(ppPoints) ppPoints.textContent = data.points || 0;
+    }
+  } catch (err) {
+    console.error('Could not sync leaderboard status:', err);
+  }
 
   // owner-only member management — exact match, not case-insensitive,
   // since only one account can ever hold the OWNER_USERNAME username
   const adminBlock = document.getElementById('pp-admin-block');
+  const navManageLink = document.getElementById('nav-manage-link');
   if(adminBlock){
     if(user.displayName === OWNER_USERNAME){
       adminBlock.classList.remove('hidden');
+      if(navManageLink) navManageLink.classList.remove('hidden');
       loadMemberList();
+      populateLeaderboardDropdowns();
+      // covers everyone on the leaderboard in one pass, not just this
+      // account — see the function below for why this matters
+      catchUpAllLeaderboardMembers();
     } else {
       adminBlock.classList.add('hidden');
+      if(navManageLink) navManageLink.classList.add('hidden');
     }
+  }
+}
+
+/* =========================================================
+   DAILY POINTS CATCH-UP — EVERYONE, NOT JUST WHOEVER'S SIGNED IN
+   ---------------------------------------------------------
+   The self-accrual inside syncPersonalPanel above only updates the
+   ONE account that's currently signed in — someone who hasn't
+   opened the site in a week wouldn't get caught up until they
+   personally logged back in. This runs the same +2/day catch-up
+   for every single leaderboard member at once, but only the owner
+   is allowed to write arbitrary point changes to other people's
+   docs (see the Firestore rules), so it only runs when the owner
+   opens the site. Between this (whenever you open it) and the
+   self-accrual (whenever each member opens it themselves), every
+   member ends up caught up the next time either of you visits —
+   there's no gap longer than "however long until someone looks."
+
+   Genuinely automatic, exact-midnight accrual with nobody needing
+   to open the site at all isn't possible from a plain HTML page —
+   that needs a real backend cron job (a scheduled Firebase Cloud
+   Function), which is outside what this file can do on its own.
+   ========================================================= */
+async function catchUpAllLeaderboardMembers(){
+  try {
+    const snap = await db.collection('leaderboard').get();
+    if(snap.empty) return;
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const today = new Date(todayStr + 'T00:00:00');
+    const batch = db.batch();
+    let anyUpdates = false;
+
+    snap.forEach(doc => {
+      const data = doc.data();
+
+      if(!data.lastAccrualDate){
+        batch.update(doc.ref, { lastAccrualDate: todayStr });
+        anyUpdates = true;
+        return;
+      }
+      if(data.lastAccrualDate === todayStr) return; // already caught up today
+
+      const last = new Date(data.lastAccrualDate + 'T00:00:00');
+      const daysElapsed = Math.max(0, Math.round((today - last) / 86400000));
+      if(daysElapsed > 0){
+        batch.update(doc.ref, {
+          points: firebase.firestore.FieldValue.increment(daysElapsed * 2),
+          lastAccrualDate: todayStr
+        });
+        anyUpdates = true;
+      }
+    });
+
+    if(anyUpdates) await batch.commit();
+  } catch (err) {
+    console.error('Could not run daily catch-up for all leaderboard members:', err);
   }
 }
 
@@ -3709,11 +4025,11 @@ async function deleteMemberFromPanel(usernameKey, uid, displayName){
 
 const leaderboardRowsEl = document.getElementById('leaderboard-rows');
 
-function renderLeaderboard(){
+function renderLeaderboard(entries){
   if(!leaderboardRowsEl) return;
   leaderboardRowsEl.innerHTML = '';
 
-  if(LEADERBOARD_DATA.length === 0){
+  if(!entries || entries.length === 0){
     const empty = document.createElement('div');
     empty.className = 'leaderboard-empty';
     empty.textContent = 'No members on the leaderboard yet.';
@@ -3722,18 +4038,22 @@ function renderLeaderboard(){
   }
 
   // sort highest points first
-  const sorted = [...LEADERBOARD_DATA].sort((a, b) => b.points - a.points);
+  const sorted = [...entries].sort((a, b) => b.points - a.points);
 
   sorted.forEach((member, i) => {
     const row = document.createElement('div');
     row.className = 'leaderboard-row';
 
+    // only the top 3 get the gold/silver/bronze badge treatment —
+    // everyone else stays plain, same as before
+    const medalClass = i === 0 ? 'lb-rank-1' : i === 1 ? 'lb-rank-2' : i === 2 ? 'lb-rank-3' : '';
+
     const division = document.createElement('span');
-    division.className = 'lb-col lb-col-division';
+    division.className = 'lb-col lb-col-division' + (medalClass ? ' lb-rank-badge ' + medalClass : '');
     division.textContent = (i + 1) + '.';
 
     const imageWrap = document.createElement('span');
-    imageWrap.className = 'lb-col lb-col-image';
+    imageWrap.className = 'lb-col lb-col-image' + (medalClass ? ' ' + medalClass : '');
     const img = document.createElement('img');
     img.src = member.image;
     imageWrap.appendChild(img);
@@ -3745,6 +4065,13 @@ function renderLeaderboard(){
     const username = document.createElement('span');
     username.className = 'lb-col lb-col-username';
     username.textContent = member.username;
+    // owner-assigned name color: either 'rainbow' (animated gradient
+    // text) or a plain hex color, set from the Member Color panel
+    if(member.nameColor === 'rainbow'){
+      username.classList.add('lb-username-rainbow');
+    } else if(member.nameColor){
+      username.style.color = member.nameColor;
+    }
 
     const points = document.createElement('span');
     points.className = 'lb-col lb-col-points';
@@ -3760,7 +4087,6 @@ function renderLeaderboard(){
     leaderboardRowsEl.appendChild(row);
   });
 }
-renderLeaderboard();
 
 /* =========================================================
    WORK LIBRARIES
@@ -3958,6 +4284,285 @@ if(lbMemberOverlay){
   lbMemberOverlay.addEventListener('click', (e) => {
     if(e.target === lbMemberOverlay) lbMemberOverlay.classList.remove('open');
   });
+}
+
+/* =========================================================
+   OWNER-ONLY: LEADERBOARD MEMBERSHIP + POINTS
+   ---------------------------------------------------------
+   "Leaderboard Membership" adds/removes a member from the
+   leaderboard/{uid} collection. Adding starts them at 0 points;
+   the +2/day catch-up (see syncPersonalPanel above) then runs on
+   ITS OWN whenever that member's own account next opens the site,
+   since each member's own uid is what's allowed to write their
+   own daily accrual — the owner doesn't need to be present for it
+   to happen.
+
+   "Adjust Points" makes a manual award/penalty on top of that,
+   tagged with whichever points type is picked (mirrors the same
+   labels already used in the Rankings tab), and keeps both the
+   running total and that category's subtotal in sync.
+   ========================================================= */
+const lbUserSelect = document.getElementById('lb-user-select');
+const lbMembershipMsg = document.getElementById('lb-membership-message');
+const lbMembershipToggleBtn = document.getElementById('lb-membership-toggle-btn');
+
+const lbPointsUserSelect = document.getElementById('lb-points-user-select');
+const lbPointsCategorySelect = document.getElementById('lb-points-category');
+const lbPointsAmountInput = document.getElementById('lb-points-amount');
+const lbPointsMsg = document.getElementById('lb-points-message');
+const lbPointsAddBtn = document.getElementById('lb-points-add-btn');
+const lbPointsRemoveBtn = document.getElementById('lb-points-remove-btn');
+
+// fill the points-type dropdown once, on page load
+if(lbPointsCategorySelect){
+  lbPointsCategorySelect.innerHTML = '';
+  POINTS_CATEGORIES.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    lbPointsCategorySelect.appendChild(opt);
+  });
+}
+
+/* --- Member Color --- */
+const lbColorUserSelect = document.getElementById('lb-color-user-select');
+const lbColorMsg = document.getElementById('lb-color-message');
+const lbColorSwatchGrid = document.getElementById('lb-color-swatch-grid');
+
+// 20 preset colors, spread around the color wheel so they stay
+// visually distinct from each other
+const NAME_COLOR_PALETTE = [
+  '#ff4d4d', '#ff7a4d', '#ff9d4d', '#ffc24d', '#ffe14d',
+  '#d4ff4d', '#a0ff4d', '#4dff6a', '#4dffa0', '#4dffd6',
+  '#4de1ff', '#4db8ff', '#4d8aff', '#4d5aff', '#7b4dff',
+  '#a84dff', '#d24dff', '#ff4dd2', '#ff4d94', '#ffffff'
+];
+const RGB_COLOR_VALUE = 'rainbow';
+
+function buildColorSwatches(){
+  if(!lbColorSwatchGrid) return;
+  lbColorSwatchGrid.innerHTML = '';
+
+  NAME_COLOR_PALETTE.forEach(hex => {
+    const swatch = document.createElement('button');
+    swatch.type = 'button';
+    swatch.className = 'lb-color-swatch';
+    swatch.style.background = hex;
+    swatch.dataset.color = hex;
+    swatch.setAttribute('aria-label', hex);
+    swatch.addEventListener('click', () => applyMemberColor(hex));
+    lbColorSwatchGrid.appendChild(swatch);
+  });
+
+  // the 21st swatch: animated left-to-right RGB gradient
+  const rgbSwatch = document.createElement('button');
+  rgbSwatch.type = 'button';
+  rgbSwatch.className = 'lb-color-swatch lb-color-rgb';
+  rgbSwatch.dataset.color = RGB_COLOR_VALUE;
+  rgbSwatch.setAttribute('aria-label', 'RGB animated');
+  rgbSwatch.addEventListener('click', () => applyMemberColor(RGB_COLOR_VALUE));
+  lbColorSwatchGrid.appendChild(rgbSwatch);
+}
+buildColorSwatches();
+
+// highlights whichever swatch matches the currently-selected user's
+// saved color, so re-opening the panel shows their existing pick
+function updateColorSwatchSelection(){
+  if(!lbColorSwatchGrid || !lbColorUserSelect) return;
+  const uid = lbColorUserSelect.value;
+  const entry = currentLeaderboardEntries.find(e => e.uid === uid);
+  const currentColor = entry ? entry.nameColor : null;
+
+  lbColorSwatchGrid.querySelectorAll('.lb-color-swatch').forEach(el => {
+    el.classList.toggle('selected', !!currentColor && el.dataset.color === currentColor);
+  });
+}
+
+if(lbColorUserSelect){
+  lbColorUserSelect.addEventListener('change', updateColorSwatchSelection);
+}
+
+async function applyMemberColor(colorValue){
+  const uid = lbColorUserSelect ? lbColorUserSelect.value : '';
+  if(!uid){
+    setMessage('lb-color-message', 'Pick a user first.', 'error');
+    return;
+  }
+  setMessage('lb-color-message', 'Saving...', null);
+  try {
+    await db.collection('leaderboard').doc(uid).update({ nameColor: colorValue });
+    setMessage('lb-color-message', 'Color updated.', 'ok');
+  } catch (err) {
+    console.error('Could not update member color:', err);
+    setMessage('lb-color-message', 'Could not save that — try again.', 'error');
+  }
+  // currentLeaderboardEntries + the swatch highlight both refresh
+  // via the live 'leaderboard' listener once the write lands
+}
+
+let allUsernamesCache = []; // every registered member, for the "add to leaderboard" dropdown
+
+// re-fills both dropdowns: the full member list (for adding/removing
+// leaderboard membership) and just the current leaderboard members
+// (for adjusting points — can't award points to someone not on it)
+async function populateLeaderboardDropdowns(){
+  if(!lbUserSelect || !lbPointsUserSelect) return;
+
+  if(allUsernamesCache.length === 0){
+    try {
+      const snap = await db.collection('usernames').orderBy('username').get();
+      allUsernamesCache = snap.docs.map(doc => doc.data());
+    } catch (err) {
+      console.error('Could not load member list for leaderboard panel:', err);
+      return;
+    }
+  }
+
+  const onLeaderboardUids = new Set(currentLeaderboardEntries.map(e => e.uid));
+
+  const prevLbUser = lbUserSelect.value;
+  lbUserSelect.innerHTML = '<option value="">Select a user…</option>';
+  allUsernamesCache.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.uid;
+    opt.textContent = m.username + (onLeaderboardUids.has(m.uid) ? ' (on leaderboard)' : '');
+    lbUserSelect.appendChild(opt);
+  });
+  if(prevLbUser) lbUserSelect.value = prevLbUser;
+  updateMembershipButton();
+
+  const prevPointsUser = lbPointsUserSelect.value;
+  lbPointsUserSelect.innerHTML = '<option value="">Select a user…</option>';
+  currentLeaderboardEntries
+    .slice()
+    .sort((a, b) => a.username.localeCompare(b.username))
+    .forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.uid;
+      opt.textContent = `${e.username} (${e.points} pts)`;
+      lbPointsUserSelect.appendChild(opt);
+    });
+  if(prevPointsUser) lbPointsUserSelect.value = prevPointsUser;
+
+  if(lbColorUserSelect){
+    const prevColorUser = lbColorUserSelect.value;
+    lbColorUserSelect.innerHTML = '<option value="">Select a user…</option>';
+    currentLeaderboardEntries
+      .slice()
+      .sort((a, b) => a.username.localeCompare(b.username))
+      .forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.uid;
+        opt.textContent = e.username;
+        lbColorUserSelect.appendChild(opt);
+      });
+    if(prevColorUser) lbColorUserSelect.value = prevColorUser;
+    updateColorSwatchSelection();
+  }
+}
+
+function updateMembershipButton(){
+  if(!lbUserSelect || !lbMembershipToggleBtn) return;
+  const uid = lbUserSelect.value;
+  if(!uid){
+    lbMembershipToggleBtn.textContent = 'Select a user first';
+    lbMembershipToggleBtn.disabled = true;
+    return;
+  }
+  const isOn = currentLeaderboardEntries.some(e => e.uid === uid);
+  lbMembershipToggleBtn.textContent = isOn ? 'Remove from Leaderboard' : 'Add to Leaderboard';
+  lbMembershipToggleBtn.className = isOn ? 'btn-ghost' : 'btn-solid';
+  lbMembershipToggleBtn.disabled = false;
+}
+
+if(lbUserSelect){
+  lbUserSelect.addEventListener('change', updateMembershipButton);
+}
+
+if(lbMembershipToggleBtn){
+  lbMembershipToggleBtn.addEventListener('click', async () => {
+    const uid = lbUserSelect.value;
+    if(!uid) return;
+    const usernameEntry = allUsernamesCache.find(m => m.uid === uid);
+    const username = usernameEntry ? usernameEntry.username : 'that member';
+    const isOn = currentLeaderboardEntries.some(e => e.uid === uid);
+
+    lbMembershipToggleBtn.disabled = true;
+    setMessage('lb-membership-message', isOn ? 'Removing...' : 'Adding...', null);
+
+    try {
+      if(isOn){
+        await db.collection('leaderboard').doc(uid).delete();
+        setMessage('lb-membership-message', `${username} removed from the leaderboard.`, 'ok');
+      } else {
+        await db.collection('leaderboard').doc(uid).set({
+          username: username,
+          points: 0,
+          categories: {},
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastAccrualDate: new Date().toISOString().slice(0, 10)
+        });
+        setMessage('lb-membership-message', `${username} added to the leaderboard at 0 points.`, 'ok');
+      }
+    } catch (err) {
+      console.error('Could not update leaderboard membership:', err);
+      setMessage('lb-membership-message', 'Could not update that member — try again.', 'error');
+    }
+    lbMembershipToggleBtn.disabled = false;
+    // currentLeaderboardEntries updates via the live listener, which
+    // re-runs populateLeaderboardDropdowns() and refreshes the button
+  });
+}
+
+async function adjustPoints(sign){
+  const uid = lbPointsUserSelect ? lbPointsUserSelect.value : '';
+  const category = lbPointsCategorySelect ? lbPointsCategorySelect.value : 'General Points';
+  const amount = Math.abs(Math.floor(Number(lbPointsAmountInput ? lbPointsAmountInput.value : 0)));
+
+  if(!uid){
+    setMessage('lb-points-message', 'Pick a user first.', 'error');
+    return;
+  }
+  if(!amount || amount < 1){
+    setMessage('lb-points-message', 'Enter a positive amount.', 'error');
+    return;
+  }
+
+  const delta = sign * amount;
+  setMessage('lb-points-message', 'Saving...', null);
+
+  const lbRef = db.collection('leaderboard').doc(uid);
+  try {
+    await db.runTransaction(async (tx) => {
+      const doc = await tx.get(lbRef);
+      if(!doc.exists) throw new Error('NOT_ON_LEADERBOARD');
+      const data = doc.data();
+      const newTotal = Math.max(0, (data.points || 0) + delta);
+
+      const update = { points: newTotal };
+      if(category !== 'General Points'){
+        const currentCategoryValue = (data.categories && data.categories[category]) || 0;
+        const newCategoryValue = Math.max(0, currentCategoryValue + delta);
+        update[`categories.${category}`] = newCategoryValue;
+      }
+      tx.update(lbRef, update);
+    });
+    setMessage('lb-points-message',
+      `${sign > 0 ? 'Added' : 'Removed'} ${amount} ${category} ${sign > 0 ? 'to' : 'from'} that member.`, 'ok');
+    if(lbPointsAmountInput) lbPointsAmountInput.value = '1';
+  } catch (err) {
+    console.error('Could not adjust points:', err);
+    setMessage('lb-points-message',
+      err.message === 'NOT_ON_LEADERBOARD' ? 'That member is no longer on the leaderboard.' : 'Could not save that — try again.',
+      'error');
+  }
+}
+
+if(lbPointsAddBtn){
+  lbPointsAddBtn.addEventListener('click', () => adjustPoints(1));
+}
+if(lbPointsRemoveBtn){
+  lbPointsRemoveBtn.addEventListener('click', () => adjustPoints(-1));
 }
 
 /* =========================================================
@@ -4243,11 +4848,17 @@ const chapterFilesClose = document.getElementById('chapter-files-close');
 const chapterFilesBack = document.getElementById('chapter-files-back');
 const chapterFilesTitle = document.getElementById('chapter-files-title');
 const cfUploadRow = document.getElementById('cf-upload-row');
-const cfPhotoInput = document.getElementById('cf-photo-input');
+const cfPhotoInputGallery = document.getElementById('cf-photo-input-gallery');
+const cfPhotoInputCamera = document.getElementById('cf-photo-input-camera');
 const cfUploadBtn = document.getElementById('cf-upload-btn');
 const cfUploadStatus = document.getElementById('cf-upload-status');
 const cfPhotoGrid = document.getElementById('cf-photo-grid');
 const cfEmptyMsg = document.getElementById('cf-empty-msg');
+
+const cfUploadChoiceOverlay = document.getElementById('cf-upload-choice-overlay');
+const cfUploadChoiceClose = document.getElementById('cf-upload-choice-close');
+const cfChoiceFolderBtn = document.getElementById('cf-choice-folder-btn');
+const cfChoiceCameraBtn = document.getElementById('cf-choice-camera-btn');
 
 let cfUnsubscribe = null;
 let cfCurrentMember = null;
@@ -4340,6 +4951,7 @@ function openChapterFiles(member, subject, chapter){
 
 function closeChapterFiles(){
   chapterFilesOverlay.classList.remove('open');
+  if(cfUploadChoiceOverlay) cfUploadChoiceOverlay.classList.remove('open');
   if(cfUnsubscribe){ cfUnsubscribe(); cfUnsubscribe = null; }
   cfCurrentMember = null;
   cfCurrentSubject = null;
@@ -4359,23 +4971,43 @@ if(chapterFilesOverlay){
   });
 }
 
+// "Upload Files" opens the folder-vs-camera choice panel instead of
+// going straight to a file picker
 if(cfUploadBtn){
-  cfUploadBtn.addEventListener('click', () => cfPhotoInput.click());
+  cfUploadBtn.addEventListener('click', () => {
+    if(cfUploadChoiceOverlay) cfUploadChoiceOverlay.classList.add('open');
+  });
+}
+if(cfUploadChoiceClose){
+  cfUploadChoiceClose.addEventListener('click', () => cfUploadChoiceOverlay.classList.remove('open'));
+}
+if(cfUploadChoiceOverlay){
+  cfUploadChoiceOverlay.addEventListener('click', (e) => {
+    if(e.target === cfUploadChoiceOverlay) cfUploadChoiceOverlay.classList.remove('open');
+  });
+}
+if(cfChoiceFolderBtn){
+  cfChoiceFolderBtn.addEventListener('click', () => {
+    cfUploadChoiceOverlay.classList.remove('open');
+    cfPhotoInputGallery.click(); // has `multiple` — lets them pick several at once
+  });
+}
+if(cfChoiceCameraBtn){
+  cfChoiceCameraBtn.addEventListener('click', () => {
+    cfUploadChoiceOverlay.classList.remove('open');
+    cfPhotoInputCamera.click(); // capture="environment" opens the camera directly
+  });
 }
 
-if(cfPhotoInput){
-  cfPhotoInput.addEventListener('change', () => {
-    const file = cfPhotoInput.files[0];
-    if(!file || !cfCurrentMember || !cfCurrentSubject || !cfCurrentChapter) return;
-
-    cfUploadStatus.textContent = 'Uploading...';
-
+// shared by both inputs below — reads a File, downsizes it to stay
+// well under Firestore's per-document limit, and resolves a JPEG
+// data URL ready to store
+function fileToResizedDataUrl(file){
+  return new Promise((resolve, reject) => {
     const img = new Image();
     const reader = new FileReader();
     reader.onload = () => {
       img.onload = () => {
-        // scale down to a reasonable max dimension so it stays well
-        // under Firestore's per-document size limit
         const maxSide = 800;
         const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
         const w = Math.round(img.width * scale);
@@ -4385,33 +5017,71 @@ if(cfPhotoInput){
         canvas.width = w;
         canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-
-        db.collection('libraries').doc(cfCurrentMember.uid)
-          .collection('photos').add({
-            subject: cfCurrentSubject,
-            chapterId: cfCurrentChapter.id,
-            dataUrl: dataUrl,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          })
-          .then(() => {
-            cfUploadStatus.textContent = '';
-            // this is what flips the folder from "owner-only, empty"
-            // to visible for everyone else browsing the library
-            return db.collection('libraries').doc(cfCurrentMember.uid)
-              .collection('chapters').doc(cfCurrentChapter.id)
-              .update({ fileCount: firebase.firestore.FieldValue.increment(1) });
-          })
-          .catch(err => {
-            console.error('Could not upload file:', err);
-            cfUploadStatus.textContent = 'Upload failed — try again.';
-          });
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
       };
+      img.onerror = reject;
       img.src = reader.result;
     };
+    reader.onerror = reject;
     reader.readAsDataURL(file);
-    cfPhotoInput.value = '';
+  });
+}
+
+// uploads every file in a FileList one after another (sequential,
+// not parallel, so the status text can show real progress and so a
+// slow connection doesn't fire off a dozen uploads simultaneously),
+// then bumps fileCount once at the end by however many succeeded
+async function uploadFilesToChapter(fileList){
+  if(!fileList || fileList.length === 0 || !cfCurrentMember || !cfCurrentSubject || !cfCurrentChapter) return;
+  const files = Array.from(fileList);
+  let succeeded = 0;
+
+  for(let i = 0; i < files.length; i++){
+    cfUploadStatus.textContent = files.length > 1
+      ? `Uploading ${i + 1} of ${files.length}...`
+      : 'Uploading...';
+    try {
+      const dataUrl = await fileToResizedDataUrl(files[i]);
+      await db.collection('libraries').doc(cfCurrentMember.uid)
+        .collection('photos').add({
+          subject: cfCurrentSubject,
+          chapterId: cfCurrentChapter.id,
+          dataUrl: dataUrl,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      succeeded++;
+    } catch (err) {
+      console.error('Could not upload file:', err);
+    }
+  }
+
+  if(succeeded > 0){
+    // this is what flips the folder from "owner-only, empty" to
+    // visible for everyone else browsing the library
+    try {
+      await db.collection('libraries').doc(cfCurrentMember.uid)
+        .collection('chapters').doc(cfCurrentChapter.id)
+        .update({ fileCount: firebase.firestore.FieldValue.increment(succeeded) });
+    } catch (err) {
+      console.error('Could not update chapter file count:', err);
+    }
+  }
+
+  cfUploadStatus.textContent = succeeded === files.length
+    ? ''
+    : `Uploaded ${succeeded} of ${files.length} — some failed.`;
+}
+
+if(cfPhotoInputGallery){
+  cfPhotoInputGallery.addEventListener('change', () => {
+    uploadFilesToChapter(cfPhotoInputGallery.files);
+    cfPhotoInputGallery.value = '';
+  });
+}
+if(cfPhotoInputCamera){
+  cfPhotoInputCamera.addEventListener('change', () => {
+    uploadFilesToChapter(cfPhotoInputCamera.files);
+    cfPhotoInputCamera.value = '';
   });
 }
 
