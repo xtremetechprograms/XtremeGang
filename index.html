@@ -86,6 +86,7 @@ input{font-family:inherit;}
 
 .hidden{display:none !important;}
 
+
 /* =========================================================
    INTRO / STARTUP SCREEN
    ========================================================= */
@@ -2235,7 +2236,6 @@ input{font-family:inherit;}
           <a href="#bank">Bank Account</a>
           <a href="#personal-panel">Personal Panel</a>
           <a href="#chats">XtremeChats</a>
-          <a href="#personal-panel" id="nav-manage-link" class="hidden">Manage</a>
         </div>
       </li>
     </ul>
@@ -3800,11 +3800,9 @@ async function syncPersonalPanel(user){
   // owner-only member management — exact match, not case-insensitive,
   // since only one account can ever hold the OWNER_USERNAME username
   const adminBlock = document.getElementById('pp-admin-block');
-  const navManageLink = document.getElementById('nav-manage-link');
   if(adminBlock){
     if(user.displayName === OWNER_USERNAME){
       adminBlock.classList.remove('hidden');
-      if(navManageLink) navManageLink.classList.remove('hidden');
       loadMemberList();
       populateLeaderboardDropdowns();
       // covers everyone on the leaderboard in one pass, not just this
@@ -3812,7 +3810,6 @@ async function syncPersonalPanel(user){
       catchUpAllLeaderboardMembers();
     } else {
       adminBlock.classList.add('hidden');
-      if(navManageLink) navManageLink.classList.add('hidden');
     }
   }
 }
@@ -5475,6 +5472,6 @@ window.addEventListener('DOMContentLoaded', () => {
   drawCaptcha();
   runIntro();
 });
-</script>
-</body>
+
+</script></body>
 </html>
