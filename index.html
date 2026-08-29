@@ -592,7 +592,21 @@ input{font-family:inherit;}
 .tab-section.active{ display:block; }
 
 .about-section{
+  position:relative;
+  min-height:calc(100vh - 64px);
   padding:80px 28px 100px;
+  overflow:hidden;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,11,0.6) 0%, rgba(5,5,11,0.72) 55%, rgba(5,5,11,0.88) 100%),
+    url("https://github.com/xtremetechprograms/bottril/blob/main/8kbg2.jpg?raw=true");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+@media (max-width:900px){
+  /* background-attachment:fixed is unreliable on mobile browsers */
+  .about-section{ background-attachment:scroll; }
 }
 .about-inner{
   max-width:960px;
@@ -656,6 +670,48 @@ input{font-family:inherit;}
   line-height:1.55;
 }
 .about-actions{ margin-top:48px; display:flex; justify-content:center; }
+
+/* =========================================================
+   RULES AND REGULATIONS
+   ---------------------------------------------------------
+   Deliberately no background image — plain, same as About Us,
+   just inherits the site's base dark background.
+   ========================================================= */
+.rules-section{
+  position:relative;
+  min-height:calc(100vh - 64px);
+  padding:80px 28px 100px;
+  overflow:hidden;
+  background-image:
+    linear-gradient(180deg, rgba(5,5,11,0.6) 0%, rgba(5,5,11,0.72) 55%, rgba(5,5,11,0.88) 100%),
+    url("https://github.com/xtremetechprograms/bottril/blob/main/8kbg.jpg?raw=true");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+@media (max-width:900px){
+  /* background-attachment:fixed is unreliable on mobile browsers */
+  .rules-section{ background-attachment:scroll; }
+}
+.rules-inner{
+  max-width:960px;
+  margin:0 auto;
+  text-align:center;
+}
+.rules-inner h2{
+  font-family:var(--font-display);
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  font-weight:900;
+  letter-spacing:1px;
+}
+.rules-lede{
+  margin-top:14px;
+  color:var(--text-mid);
+  font-size:1.05rem;
+  line-height:1.7;
+}
+.rules-actions{ margin-top:48px; display:flex; justify-content:center; }
 
 /* =========================================================
    WORK LIBRARIES
@@ -1867,6 +1923,43 @@ input{font-family:inherit;}
 }
 .lb-member-points .rank-row-chip{ font-size:0.75rem; }
 
+.lb-member-progress{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+}
+.lb-member-progress-label{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-mid);
+  margin-bottom:8px;
+}
+.lb-member-progress-track{
+  height:8px;
+  background:var(--bg-panel-2, #12121f);
+  border:1px solid var(--line);
+  border-radius:5px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+.lb-member-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg, var(--neon-blue-dim, #0e6d85), var(--neon-blue));
+  border-radius:5px 0 0 5px;
+  transition:width .3s ease;
+}
+.lb-member-progress-text{
+  font-size:0.8rem;
+  color:var(--text-hi);
+}
+.lb-member-progress-maxed{
+  font-size:0.85rem;
+  color:var(--neon-blue);
+  font-weight:600;
+}
+
 /* =========================================================
    PERSONAL PANEL
    ---------------------------------------------------------
@@ -2291,6 +2384,17 @@ input{font-family:inherit;}
     </div>
   </section>
 
+  <section class="tab-section rules-section" id="rules">
+    <div class="rules-inner">
+      <h2><span class="hx">Rules</span> <span class="hg">and Regulations</span></h2>
+      <p class="rules-lede">This section is empty for now — content coming soon.</p>
+
+      <div class="rules-actions">
+        <button class="btn-solid" onclick="location.hash='#home'">Back to Home</button>
+      </div>
+    </div>
+  </section>
+
   <section class="tab-section libraries-section" id="libraries">
     <div class="libraries-content">
       <h2 class="libraries-heading"><span class="hx">Work</span> <span class="hg">Libraries</span></h2>
@@ -2600,6 +2704,7 @@ input{font-family:inherit;}
         </div>
       </div>
       <div class="lb-member-points" id="lb-member-points"></div>
+      <div class="lb-member-progress" id="lb-member-progress"></div>
     </div>
   </div>
 
@@ -3425,6 +3530,16 @@ function showTab(id){
   document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
   target.classList.add('active');
   window.scrollTo({ top:0, behavior:'instant' in window ? 'instant' : 'auto' });
+
+  // extra reliability: re-run the daily catch-up for every leaderboard
+  // member specifically whenever the owner opens this tab, not just
+  // once at login — covers long sessions that cross midnight without
+  // a fresh page load, and doesn't hurt anything to call again since
+  // it's a no-op for anyone already caught up today
+  if(id === 'leaderboard' && auth.currentUser && auth.currentUser.displayName === OWNER_USERNAME){
+    catchUpAllLeaderboardMembers();
+  }
+
   return true;
 }
 
@@ -3709,15 +3824,31 @@ db.collection('leaderboard').onSnapshot(async (snapshot) => {
       }
     } catch (err) { /* fall back to identicon */ }
 
-    const rank = rankForPoints(e.points || 0);
     const breakdown = Object.entries(e.categories || {})
       .filter(([, value]) => value)
       .map(([label, value]) => ({ label, value }));
 
+    // the number shown/ranked on the leaderboard row is ONLY General
+    // Points (daily accrual + anything manually added under "General
+    // Points") — Helping Points, Disciplinary Points, etc. don't
+    // count toward this number or the rank badge. They're still
+    // visible in full when you click into a member's panel.
+    const generalPoints = (e.categories && e.categories['General Points']) || 0;
+    const rank = rankForPoints(generalPoints);
+
+    // tiebreaker only: when two members have the same General
+    // Points, whoever earned more through the named categories
+    // (Helping Points, etc.) ranks above the other
+    const otherPoints = breakdown
+      .filter(b => b.label !== 'General Points')
+      .reduce((sum, b) => sum + b.value, 0);
+
     return {
       uid: e.uid,
       username: e.username,
-      points: e.points || 0,
+      points: generalPoints,
+      totalPoints: e.points || 0, // grand total across every category, shown in the member panel only
+      otherPoints,
       image: avatarUrl,
       rankName: rank.name,
       rankColor: rank.color,
@@ -3782,6 +3913,7 @@ async function syncPersonalPanel(user){
           const bonus = daysElapsed * 2;
           await lbRef.update({
             points: firebase.firestore.FieldValue.increment(bonus),
+            'categories.General Points': firebase.firestore.FieldValue.increment(bonus),
             lastAccrualDate: todayStr
           });
           data.points = (data.points || 0) + bonus;
@@ -3789,9 +3921,13 @@ async function syncPersonalPanel(user){
         }
       }
 
-      const rank = rankForPoints(data.points || 0);
+      // rank + the number shown here match the leaderboard: General
+      // Points only (daily accrual + manually-added General Points),
+      // not the grand total across every category
+      const generalPoints = (data.categories && data.categories['General Points']) || 0;
+      const rank = rankForPoints(generalPoints);
       if(ppRank) ppRank.textContent = rank.name;
-      if(ppPoints) ppPoints.textContent = data.points || 0;
+      if(ppPoints) ppPoints.textContent = generalPoints;
     }
   } catch (err) {
     console.error('Could not sync leaderboard status:', err);
@@ -3857,8 +3993,10 @@ async function catchUpAllLeaderboardMembers(){
       const last = new Date(data.lastAccrualDate + 'T00:00:00');
       const daysElapsed = Math.max(0, Math.round((today - last) / 86400000));
       if(daysElapsed > 0){
+        const bonus = daysElapsed * 2;
         batch.update(doc.ref, {
-          points: firebase.firestore.FieldValue.increment(daysElapsed * 2),
+          points: firebase.firestore.FieldValue.increment(bonus),
+          'categories.General Points': firebase.firestore.FieldValue.increment(bonus),
           lastAccrualDate: todayStr
         });
         anyUpdates = true;
@@ -4035,7 +4173,14 @@ function renderLeaderboard(entries){
   }
 
   // sort highest points first
-  const sorted = [...entries].sort((a, b) => b.points - a.points);
+  // sort highest points first; ties broken by whoever earned more
+  // through named categories (Helping Points, etc.), then finally
+  // alphabetically so the order is always deterministic, never random
+  const sorted = [...entries].sort((a, b) => {
+    if(b.points !== a.points) return b.points - a.points;
+    if((b.otherPoints || 0) !== (a.otherPoints || 0)) return (b.otherPoints || 0) - (a.otherPoints || 0);
+    return a.username.localeCompare(b.username);
+  });
 
   sorted.forEach((member, i) => {
     const row = document.createElement('div');
@@ -4252,6 +4397,7 @@ const lbMemberPic = document.getElementById('lb-member-pic');
 const lbMemberUsername = document.getElementById('lb-member-username');
 const lbMemberRank = document.getElementById('lb-member-rank');
 const lbMemberPoints = document.getElementById('lb-member-points');
+const lbMemberProgress = document.getElementById('lb-member-progress');
 
 function openMemberPanel(member){
   lbMemberPic.src = member.image;
@@ -4260,17 +4406,62 @@ function openMemberPanel(member){
   lbMemberRank.className = 'lb-member-rank' + (member.rankColor ? ' ' + member.rankColor : '');
 
   lbMemberPoints.innerHTML = '';
-  const totalChip = document.createElement('span');
-  totalChip.className = 'rank-row-chip';
-  totalChip.textContent = member.points + ' Total Points';
-  lbMemberPoints.appendChild(totalChip);
-
   (member.breakdown || []).forEach(b => {
     const chip = document.createElement('span');
     chip.className = 'rank-row-chip';
     chip.textContent = b.value + ' ' + b.label;
     lbMemberPoints.appendChild(chip);
   });
+  if(!member.breakdown || member.breakdown.length === 0){
+    const empty = document.createElement('span');
+    empty.className = 'rank-row-chip';
+    empty.textContent = 'No points yet';
+    lbMemberPoints.appendChild(empty);
+  }
+
+  // next-rank progress: ALL_RANKS_FLAT is sorted highest-points-first,
+  // so the rank just above the member's current rank in that list is
+  // the very next one they're working toward
+  if(lbMemberProgress){
+    lbMemberProgress.innerHTML = '';
+    const currentIndex = ALL_RANKS_FLAT.findIndex(r => r.name === member.rankName);
+    const nextRank = currentIndex > 0 ? ALL_RANKS_FLAT[currentIndex - 1] : null;
+
+    if(currentIndex === -1){
+      // shouldn't normally happen — rank name didn't match the ladder
+    } else if(!nextRank){
+      const maxed = document.createElement('div');
+      maxed.className = 'lb-member-progress-maxed';
+      maxed.textContent = '🏆 Highest rank reached!';
+      lbMemberProgress.appendChild(maxed);
+    } else {
+      const currentRankPoints = currentIndex >= 0 ? ALL_RANKS_FLAT[currentIndex].points : 0;
+      const span = Math.max(1, nextRank.points - currentRankPoints);
+      const progressInSpan = Math.max(0, member.points - currentRankPoints);
+      const pct = Math.min(100, Math.round((progressInSpan / span) * 100));
+      const pointsNeeded = Math.max(0, nextRank.points - member.points);
+
+      const label = document.createElement('div');
+      label.className = 'lb-member-progress-label';
+      label.textContent = 'Progress to ' + nextRank.name;
+      lbMemberProgress.appendChild(label);
+
+      const track = document.createElement('div');
+      track.className = 'lb-member-progress-track';
+      const fill = document.createElement('div');
+      fill.className = 'lb-member-progress-fill';
+      fill.style.width = pct + '%';
+      track.appendChild(fill);
+      lbMemberProgress.appendChild(track);
+
+      const text = document.createElement('div');
+      text.className = 'lb-member-progress-text';
+      text.textContent = pointsNeeded > 0
+        ? `${pointsNeeded} more points needed (${nextRank.points} total required)`
+        : `Requirement met — rank updates automatically`;
+      lbMemberProgress.appendChild(text);
+    }
+  }
 
   lbMemberOverlay.classList.add('open');
 }
@@ -4537,11 +4728,9 @@ async function adjustPoints(sign){
       const newTotal = Math.max(0, (data.points || 0) + delta);
 
       const update = { points: newTotal };
-      if(category !== 'General Points'){
-        const currentCategoryValue = (data.categories && data.categories[category]) || 0;
-        const newCategoryValue = Math.max(0, currentCategoryValue + delta);
-        update[`categories.${category}`] = newCategoryValue;
-      }
+      const currentCategoryValue = (data.categories && data.categories[category]) || 0;
+      const newCategoryValue = Math.max(0, currentCategoryValue + delta);
+      update[`categories.${category}`] = newCategoryValue;
       tx.update(lbRef, update);
     });
     setMessage('lb-points-message',
