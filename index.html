@@ -2209,6 +2209,191 @@ input{font-family:inherit;}
   text-align:right;
 }
 
+/* --- per-message hover arrow + reactions row --- */
+.chats-msg-bubble{ position:relative; }
+.chats-msg-arrow{
+  position:absolute;
+  top:2px;
+  width:22px; height:22px;
+  border-radius:50%;
+  border:none;
+  background:rgba(0,0,0,0.35);
+  color:var(--text-hi);
+  font-size:0.75rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .15s, background .15s;
+}
+.chats-msg-row.mine .chats-msg-arrow{ left:-28px; }
+.chats-msg-row.theirs .chats-msg-arrow{ right:-28px; }
+.chats-msg-row:hover .chats-msg-arrow{ opacity:1; }
+.chats-msg-arrow:hover{ background:rgba(0,0,0,0.6); }
+
+.chats-msg-reactions{
+  display:flex;
+  gap:4px;
+  margin-top:4px;
+  flex-wrap:wrap;
+}
+.chats-msg-reaction-chip{
+  background:rgba(18,18,31,0.85);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:1px 7px;
+  font-size:0.72rem;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  cursor:pointer;
+}
+.chats-msg-reaction-chip.mine{ border-color:var(--neon-blue); }
+
+.chats-msg-reply-quote{
+  border-left:3px solid var(--neon-blue);
+  background:rgba(0,0,0,0.2);
+  border-radius:8px;
+  padding:6px 10px;
+  margin-bottom:6px;
+  font-size:0.78rem;
+  opacity:0.85;
+}
+.chats-msg-reply-quote-sender{ font-weight:700; }
+
+.chats-msg-forwarded-tag{
+  font-size:0.68rem;
+  color:var(--text-mid);
+  font-style:italic;
+  margin-bottom:3px;
+}
+
+.chats-msg-star{
+  position:absolute;
+  top:-8px;
+  font-size:0.7rem;
+}
+.chats-msg-row.mine .chats-msg-star{ left:-4px; }
+.chats-msg-row.theirs .chats-msg-star{ right:-4px; }
+
+/* --- context menu --- */
+.chats-msg-menu{
+  position:fixed;
+  z-index:500;
+  background:var(--bg-panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px;
+  width:220px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.55);
+}
+.chats-msg-menu.hidden{ display:none; }
+.chats-msg-menu-reactions{
+  display:flex;
+  justify-content:space-between;
+  padding-bottom:8px;
+  margin-bottom:6px;
+  border-bottom:1px solid var(--line);
+}
+.chats-msg-menu-reactions button{
+  background:none;
+  border:none;
+  font-size:1.2rem;
+  cursor:pointer;
+  padding:2px;
+  border-radius:50%;
+  transition:transform .12s, background .12s;
+}
+.chats-msg-menu-reactions button:hover{ transform:scale(1.25); background:rgba(255,255,255,0.08); }
+.chats-msg-menu-item{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:none;
+  border:none;
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:0.86rem;
+  padding:8px 8px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.chats-msg-menu-item:hover{ background:rgba(34,211,255,0.1); }
+.chats-msg-menu-danger{ color:var(--neon-red); }
+.chats-msg-menu-danger:hover{ background:rgba(255,45,85,0.1); }
+
+/* --- reply preview above input --- */
+.chats-reply-preview{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 20px;
+  background:rgba(12,12,22,0.85);
+  border-top:1px solid var(--line);
+}
+.chats-reply-preview.hidden{ display:none; }
+.chats-reply-preview-bar{
+  width:3px; align-self:stretch;
+  background:var(--neon-blue);
+  border-radius:3px;
+  flex-shrink:0;
+}
+.chats-reply-preview-text{
+  flex:1;
+  font-size:0.8rem;
+  color:var(--text-mid);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#chats-reply-cancel-btn{
+  background:none; border:none;
+  color:var(--text-mid);
+  font-size:1.1rem;
+  cursor:pointer;
+}
+
+/* --- pinned message banner --- */
+.chats-pinned-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 20px;
+  background:rgba(34,211,255,0.08);
+  border-bottom:1px solid var(--line);
+  font-size:0.82rem;
+}
+.chats-pinned-banner.hidden{ display:none; }
+.chats-pinned-text{
+  flex:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#chats-pinned-unpin-btn{
+  background:none;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:3px 12px;
+  color:var(--text-hi);
+  font-size:0.72rem;
+  cursor:pointer;
+}
+
+/* --- forward picker --- */
+.chats-forward-list{ list-style:none; max-height:320px; overflow-y:auto; }
+.chats-forward-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 6px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.chats-forward-row:hover{ background:rgba(34,211,255,0.08); }
+.chats-forward-row img{
+  width:36px; height:36px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
 .chats-input-row{
   display:flex;
   align-items:center;
@@ -2944,7 +3129,19 @@ input{font-family:inherit;}
             <button type="button" class="chats-icon-btn" id="chats-call-btn" aria-label="Call">📞</button>
           </div>
 
+          <div class="chats-pinned-banner hidden" id="chats-pinned-banner">
+            <span>📌</span>
+            <span class="chats-pinned-text" id="chats-pinned-text"></span>
+            <button type="button" id="chats-pinned-unpin-btn">Unpin</button>
+          </div>
+
           <div class="chats-messages" id="chats-messages"></div>
+
+          <div class="chats-reply-preview hidden" id="chats-reply-preview">
+            <div class="chats-reply-preview-bar"></div>
+            <div class="chats-reply-preview-text" id="chats-reply-preview-text"></div>
+            <button type="button" id="chats-reply-cancel-btn" aria-label="Cancel reply">&times;</button>
+          </div>
 
           <div class="chats-input-row">
             <input type="file" id="chats-file-input" hidden>
@@ -2956,6 +3153,37 @@ input{font-family:inherit;}
       </div>
     </div>
   </section>
+
+  <!-- per-message context menu — positioned dynamically next to
+       whichever message's arrow was clicked -->
+  <div class="chats-msg-menu hidden" id="chats-msg-menu">
+    <div class="chats-msg-menu-reactions" id="chats-msg-menu-reactions">
+      <button type="button" data-emoji="👍">👍</button>
+      <button type="button" data-emoji="❤️">❤️</button>
+      <button type="button" data-emoji="😂">😂</button>
+      <button type="button" data-emoji="😮">😮</button>
+      <button type="button" data-emoji="😢">😢</button>
+      <button type="button" data-emoji="🙏">🙏</button>
+    </div>
+    <button type="button" class="chats-msg-menu-item" data-action="info">ⓘ Message info</button>
+    <button type="button" class="chats-msg-menu-item" data-action="reply">↩ Reply</button>
+    <button type="button" class="chats-msg-menu-item" data-action="copy">📋 Copy</button>
+    <button type="button" class="chats-msg-menu-item" data-action="forward">➡ Forward</button>
+    <button type="button" class="chats-msg-menu-item" data-action="pin">📌 Pin</button>
+    <button type="button" class="chats-msg-menu-item" data-action="ask-ai">✨ Ask XtremeAI</button>
+    <button type="button" class="chats-msg-menu-item" data-action="star">⭐ Star</button>
+    <button type="button" class="chats-msg-menu-item chats-msg-menu-danger" data-action="delete">🗑 Delete</button>
+  </div>
+
+  <!-- forward-to picker -->
+  <div class="modal-overlay" id="chats-forward-overlay">
+    <div class="modal-box" style="max-width:340px;">
+      <button type="button" class="modal-close" id="chats-forward-close" aria-label="Close">&times;</button>
+      <h3 class="modal-title" style="margin-bottom:18px;">Forward to...</h3>
+      <ul class="chats-forward-list" id="chats-forward-list"></ul>
+    </div>
+  </div>
+
 
   <!-- active call UI -->
   <div class="modal-overlay" id="chats-call-overlay">
@@ -3896,7 +4124,7 @@ if(SpeechRecognitionCtor && aiMicBtn){
 // Must be https:// — GitHub Pages will block plain http:// calls
 // as mixed content.
 // =========================================================
-const XTREMEAI_API_URL = "https://YOUR-DOMAIN-HERE.com/api/chat";
+const XTREMEAI_API_URL = "/api/chat";
 
 async function getAIReply(userText, imageDataUrl){
   try {
@@ -6219,6 +6447,8 @@ function openChatWith(partner){
   chatsThreadAvatar.src = partner.avatarUrl;
   chatsThreadName.textContent = partner.username;
   chatsMessagesEl.innerHTML = '';
+  chatsClearReply();
+  chatsRefreshPinnedBanner();
 
   // ensures the chat doc exists (idempotent merge) so both people's
   // clients can read/write the same conversation
@@ -6236,18 +6466,48 @@ function openChatWith(partner){
     .orderBy('createdAt')
     .onSnapshot(snapshot => {
       chatsMessagesEl.innerHTML = '';
-      snapshot.forEach(doc => renderChatMessage(doc.data()));
+      snapshot.forEach(doc => renderChatMessage(doc.data(), doc.id));
       chatsMessagesEl.scrollTop = chatsMessagesEl.scrollHeight;
     }, err => console.error('Could not load messages:', err));
 }
 
-function renderChatMessage(msg){
+function renderChatMessage(msg, msgId){
   const row = document.createElement('div');
   const mine = auth.currentUser && msg.senderId === auth.currentUser.uid;
   row.className = 'chats-msg-row ' + (mine ? 'mine' : 'theirs');
+  row.dataset.msgId = msgId;
 
   const bubble = document.createElement('div');
   bubble.className = 'chats-msg-bubble';
+
+  const myUid = auth.currentUser && auth.currentUser.uid;
+  const isStarred = !!(msg.starredBy && myUid && msg.starredBy.includes(myUid));
+  if(isStarred){
+    const star = document.createElement('span');
+    star.className = 'chats-msg-star';
+    star.textContent = '⭐';
+    bubble.appendChild(star);
+  }
+
+  if(msg.forwarded){
+    const tag = document.createElement('div');
+    tag.className = 'chats-msg-forwarded-tag';
+    tag.textContent = '↪ Forwarded';
+    bubble.appendChild(tag);
+  }
+
+  if(msg.replyTo){
+    const quote = document.createElement('div');
+    quote.className = 'chats-msg-reply-quote';
+    const qSender = document.createElement('div');
+    qSender.className = 'chats-msg-reply-quote-sender';
+    qSender.textContent = msg.replyTo.senderName || '';
+    const qText = document.createElement('div');
+    qText.textContent = msg.replyTo.preview || '';
+    quote.appendChild(qSender);
+    quote.appendChild(qText);
+    bubble.appendChild(quote);
+  }
 
   if(msg.type === 'image'){
     const img = document.createElement('img');
@@ -6281,22 +6541,63 @@ function renderChatMessage(msg){
   time.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   bubble.appendChild(time);
 
+  // the small hover arrow that opens the per-message context menu
+  const arrow = document.createElement('button');
+  arrow.type = 'button';
+  arrow.className = 'chats-msg-arrow';
+  arrow.setAttribute('aria-label', 'Message options');
+  arrow.textContent = '»';
+  arrow.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openChatsMsgMenu(arrow, msgId, msg, mine);
+  });
+  bubble.appendChild(arrow);
+
   row.appendChild(bubble);
+
+  if(msg.reactions && Object.keys(msg.reactions).length > 0){
+    const reactionsRow = document.createElement('div');
+    reactionsRow.className = 'chats-msg-reactions';
+    Object.entries(msg.reactions).forEach(([emoji, uids]) => {
+      if(!uids || uids.length === 0) return;
+      const chip = document.createElement('span');
+      chip.className = 'chats-msg-reaction-chip' + (myUid && uids.includes(myUid) ? ' mine' : '');
+      chip.textContent = emoji + ' ' + uids.length;
+      chip.addEventListener('click', () => chatsToggleReaction(msgId, emoji));
+      reactionsRow.appendChild(chip);
+    });
+    if(reactionsRow.children.length > 0){
+      const wrap = document.createElement('div');
+      wrap.style.display = 'flex';
+      wrap.style.justifyContent = mine ? 'flex-end' : 'flex-start';
+      wrap.appendChild(reactionsRow);
+      chatsMessagesEl.appendChild(row);
+      chatsMessagesEl.appendChild(wrap);
+      return;
+    }
+  }
+
   chatsMessagesEl.appendChild(row);
 }
+
+let chatsReplyingTo = null; // { senderName, preview } — set via the Reply menu action
 
 async function chatsSendText(){
   const text = chatsTextInput.value.trim();
   if(!text || !chatsCurrentChatId || !auth.currentUser) return;
   chatsTextInput.value = '';
+  const replyTo = chatsReplyingTo;
+  chatsClearReply();
   try {
-    await db.collection('chats').doc(chatsCurrentChatId).collection('messages').add({
+    const payload = {
       senderId: auth.currentUser.uid,
       senderName: auth.currentUser.displayName || 'Member',
       type: 'text',
       text: text,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    };
+    if(replyTo) payload.replyTo = replyTo;
+    await db.collection('chats').doc(chatsCurrentChatId).collection('messages').add(payload);
     await db.collection('chats').doc(chatsCurrentChatId).set({
       lastMessage: text,
       lastMessageAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -6346,12 +6647,15 @@ if(chatsFileInput){
         messageData = { type: 'file', dataUrl, fileName: file.name, fileType: file.type };
       }
 
-      await db.collection('chats').doc(chatsCurrentChatId).collection('messages').add({
+      const payload = {
         senderId: auth.currentUser.uid,
         senderName: auth.currentUser.displayName || 'Member',
         ...messageData,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      };
+      if(chatsReplyingTo) payload.replyTo = chatsReplyingTo;
+      chatsClearReply();
+      await db.collection('chats').doc(chatsCurrentChatId).collection('messages').add(payload);
       await db.collection('chats').doc(chatsCurrentChatId).set({
         lastMessage: isImage ? '📷 Photo' : '📄 ' + file.name,
         lastMessageAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -6361,6 +6665,283 @@ if(chatsFileInput){
       alert('Could not send that file — try again.');
     }
   });
+}
+
+/* =========================================================
+   PER-MESSAGE CONTEXT MENU
+   ---------------------------------------------------------
+   Everything from the arrow menu on each message: reactions,
+   info, reply, copy, forward, pin, Ask XtremeAI, star, delete.
+   ========================================================= */
+const chatsMsgMenu = document.getElementById('chats-msg-menu');
+const chatsReplyPreview = document.getElementById('chats-reply-preview');
+const chatsReplyPreviewText = document.getElementById('chats-reply-preview-text');
+const chatsReplyCancelBtn = document.getElementById('chats-reply-cancel-btn');
+const chatsPinnedBanner = document.getElementById('chats-pinned-banner');
+const chatsPinnedText = document.getElementById('chats-pinned-text');
+const chatsPinnedUnpinBtn = document.getElementById('chats-pinned-unpin-btn');
+const chatsForwardOverlay = document.getElementById('chats-forward-overlay');
+const chatsForwardClose = document.getElementById('chats-forward-close');
+const chatsForwardList = document.getElementById('chats-forward-list');
+
+let chatsMenuTargetId = null;
+let chatsMenuTargetMsg = null;
+let chatsMenuTargetMine = false;
+let chatsForwardingMsg = null;
+
+function chatsMsgPreview(msg){
+  if(msg.type === 'image') return '📷 Photo';
+  if(msg.type === 'file') return '📄 ' + (msg.fileName || 'Document');
+  return msg.text || '';
+}
+
+function openChatsMsgMenu(anchorEl, msgId, msg, mine){
+  chatsMenuTargetId = msgId;
+  chatsMenuTargetMsg = msg;
+  chatsMenuTargetMine = mine;
+
+  // hide Delete for messages that aren't mine — deleting someone
+  // else's message isn't supported (matches the Firestore rule,
+  // which only allows the sender to delete their own message)
+  const deleteBtn = chatsMsgMenu.querySelector('[data-action="delete"]');
+  if(deleteBtn) deleteBtn.style.display = mine ? '' : 'none';
+
+  const pinBtn = chatsMsgMenu.querySelector('[data-action="pin"]');
+  if(pinBtn) pinBtn.textContent = msg.pinned ? '📌 Unpin' : '📌 Pin';
+
+  const myUid = auth.currentUser && auth.currentUser.uid;
+  const starBtn = chatsMsgMenu.querySelector('[data-action="star"]');
+  const isStarred = !!(msg.starredBy && myUid && msg.starredBy.includes(myUid));
+  if(starBtn) starBtn.textContent = isStarred ? '⭐ Unstar' : '⭐ Star';
+
+  chatsMsgMenu.classList.remove('hidden');
+  const rect = anchorEl.getBoundingClientRect();
+  const menuWidth = 220;
+  let left = rect.left - menuWidth / 2;
+  left = Math.max(10, Math.min(left, window.innerWidth - menuWidth - 10));
+  let top = rect.bottom + 6;
+  if(top + 320 > window.innerHeight) top = Math.max(10, rect.top - 330);
+  chatsMsgMenu.style.left = left + 'px';
+  chatsMsgMenu.style.top = top + 'px';
+}
+
+function closeChatsMsgMenu(){
+  chatsMsgMenu.classList.add('hidden');
+  chatsMenuTargetId = null;
+  chatsMenuTargetMsg = null;
+}
+
+document.addEventListener('click', (e) => {
+  if(chatsMsgMenu && !chatsMsgMenu.classList.contains('hidden') && !chatsMsgMenu.contains(e.target)){
+    closeChatsMsgMenu();
+  }
+});
+
+async function chatsToggleReaction(msgId, emoji){
+  if(!chatsCurrentChatId || !auth.currentUser) return;
+  const uid = auth.currentUser.uid;
+  const msgRef = db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(msgId);
+  try {
+    const doc = await msgRef.get();
+    const data = doc.data();
+    if(!data) return;
+    const reactions = data.reactions || {};
+    const existing = reactions[emoji] || [];
+    const already = existing.includes(uid);
+    const updated = already ? existing.filter(id => id !== uid) : [...existing, uid];
+    await msgRef.update({ [`reactions.${emoji}`]: updated });
+  } catch (err) {
+    console.error('Could not react to message:', err);
+  }
+}
+
+if(chatsMsgMenu){
+  chatsMsgMenu.querySelectorAll('.chats-msg-menu-reactions button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(chatsMenuTargetId) chatsToggleReaction(chatsMenuTargetId, btn.dataset.emoji);
+      closeChatsMsgMenu();
+    });
+  });
+
+  chatsMsgMenu.querySelectorAll('.chats-msg-menu-item').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const action = btn.dataset.action;
+      const msgId = chatsMenuTargetId;
+      const msg = chatsMenuTargetMsg;
+      const mine = chatsMenuTargetMine;
+      closeChatsMsgMenu();
+      if(!msgId || !msg) return;
+
+      if(action === 'info'){
+        const d = msg.createdAt && msg.createdAt.toDate ? msg.createdAt.toDate() : new Date();
+        alert(`From: ${msg.senderName || 'Unknown'}\nSent: ${d.toLocaleString()}`);
+
+      } else if(action === 'reply'){
+        chatsReplyingTo = { senderName: msg.senderName || 'Member', preview: chatsMsgPreview(msg) };
+        chatsReplyPreviewText.textContent = chatsReplyingTo.senderName + ': ' + chatsReplyingTo.preview;
+        chatsReplyPreview.classList.remove('hidden');
+        chatsTextInput.focus();
+
+      } else if(action === 'copy'){
+        const text = chatsMsgPreview(msg);
+        navigator.clipboard.writeText(text).catch(() => {});
+
+      } else if(action === 'forward'){
+        chatsForwardingMsg = msg;
+        openChatsForwardPicker();
+
+      } else if(action === 'pin'){
+        try {
+          if(msg.pinned){
+            await db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(msgId).update({ pinned: false });
+            await db.collection('chats').doc(chatsCurrentChatId).set({ pinnedMessageId: firebase.firestore.FieldValue.delete() }, { merge: true });
+          } else {
+            await db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(msgId).update({ pinned: true });
+            await db.collection('chats').doc(chatsCurrentChatId).set({
+              pinnedMessageId: msgId,
+              pinnedPreview: msg.senderName + ': ' + chatsMsgPreview(msg)
+            }, { merge: true });
+          }
+          chatsRefreshPinnedBanner();
+        } catch (err) {
+          console.error('Could not pin/unpin message:', err);
+        }
+
+      } else if(action === 'ask-ai'){
+        const aiInput = document.getElementById('ai-input');
+        const aiForm = document.getElementById('ai-input-form');
+        if(aiInput){
+          aiInput.value = chatsMsgPreview(msg);
+          location.hash = '#xtremeai';
+          if(aiForm){
+            setTimeout(() => aiForm.dispatchEvent(new Event('submit', { cancelable: true })), 150);
+          }
+        }
+
+      } else if(action === 'star'){
+        const myUid = auth.currentUser.uid;
+        const already = !!(msg.starredBy && msg.starredBy.includes(myUid));
+        try {
+          await db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(msgId).update({
+            starredBy: already
+              ? firebase.firestore.FieldValue.arrayRemove(myUid)
+              : firebase.firestore.FieldValue.arrayUnion(myUid)
+          });
+        } catch (err) {
+          console.error('Could not star/unstar message:', err);
+        }
+
+      } else if(action === 'delete'){
+        if(!mine) return;
+        if(!confirm('Delete this message?')) return;
+        try {
+          await db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(msgId).delete();
+        } catch (err) {
+          console.error('Could not delete message:', err);
+        }
+      }
+    });
+  });
+}
+
+function chatsClearReply(){
+  chatsReplyingTo = null;
+  if(chatsReplyPreview) chatsReplyPreview.classList.add('hidden');
+}
+if(chatsReplyCancelBtn) chatsReplyCancelBtn.addEventListener('click', chatsClearReply);
+
+// pulled from chats/{chatId}.pinnedMessageId whenever a chat is opened
+function chatsRefreshPinnedBanner(){
+  if(!chatsCurrentChatId) return;
+  db.collection('chats').doc(chatsCurrentChatId).get().then(doc => {
+    const data = doc.data();
+    if(data && data.pinnedMessageId){
+      chatsPinnedText.textContent = data.pinnedPreview || 'Pinned message';
+      chatsPinnedBanner.classList.remove('hidden');
+    } else {
+      chatsPinnedBanner.classList.add('hidden');
+    }
+  }).catch(() => {});
+}
+if(chatsPinnedUnpinBtn){
+  chatsPinnedUnpinBtn.addEventListener('click', async () => {
+    if(!chatsCurrentChatId) return;
+    try {
+      const doc = await db.collection('chats').doc(chatsCurrentChatId).get();
+      const pinnedId = doc.data() && doc.data().pinnedMessageId;
+      if(pinnedId){
+        await db.collection('chats').doc(chatsCurrentChatId).collection('messages').doc(pinnedId).update({ pinned: false }).catch(() => {});
+      }
+      await db.collection('chats').doc(chatsCurrentChatId).set({ pinnedMessageId: firebase.firestore.FieldValue.delete() }, { merge: true });
+      chatsPinnedBanner.classList.add('hidden');
+    } catch (err) {
+      console.error('Could not unpin message:', err);
+    }
+  });
+}
+
+function openChatsForwardPicker(){
+  if(!chatsForwardOverlay || !chatsForwardList) return;
+  chatsForwardList.innerHTML = '';
+  chatsAllMembers.forEach(m => {
+    const li = document.createElement('li');
+    li.className = 'chats-forward-row';
+    const img = document.createElement('img');
+    img.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(m.uid)}`;
+    chatsAvatarFor(m.uid).then(url => { img.src = url; });
+    const name = document.createElement('span');
+    name.textContent = m.username;
+    li.appendChild(img);
+    li.appendChild(name);
+    li.addEventListener('click', () => chatsForwardMessageTo(m));
+    chatsForwardList.appendChild(li);
+  });
+  chatsForwardOverlay.classList.add('open');
+}
+if(chatsForwardClose){
+  chatsForwardClose.addEventListener('click', () => chatsForwardOverlay.classList.remove('open'));
+}
+if(chatsForwardOverlay){
+  chatsForwardOverlay.addEventListener('click', (e) => {
+    if(e.target === chatsForwardOverlay) chatsForwardOverlay.classList.remove('open');
+  });
+}
+
+async function chatsForwardMessageTo(targetMember){
+  if(!chatsForwardingMsg || !auth.currentUser) return;
+  const targetChatId = chatIdFor(auth.currentUser.uid, targetMember.uid);
+  const msg = chatsForwardingMsg;
+
+  const payload = {
+    senderId: auth.currentUser.uid,
+    senderName: auth.currentUser.displayName || 'Member',
+    type: msg.type || 'text',
+    forwarded: true,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(msg.type === 'image') payload.dataUrl = msg.dataUrl;
+  else if(msg.type === 'file'){ payload.dataUrl = msg.dataUrl; payload.fileName = msg.fileName; payload.fileType = msg.fileType; }
+  else payload.text = msg.text || '';
+
+  try {
+    await db.collection('chats').doc(targetChatId).set({
+      participants: [auth.currentUser.uid, targetMember.uid],
+      usernames: {
+        [auth.currentUser.uid]: auth.currentUser.displayName || 'Member',
+        [targetMember.uid]: targetMember.username
+      }
+    }, { merge: true });
+    await db.collection('chats').doc(targetChatId).collection('messages').add(payload);
+    await db.collection('chats').doc(targetChatId).set({
+      lastMessage: '↪ ' + chatsMsgPreview(msg),
+      lastMessageAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    chatsForwardOverlay.classList.remove('open');
+    chatsForwardingMsg = null;
+  } catch (err) {
+    console.error('Could not forward message:', err);
+    alert('Could not forward that message — try again.');
+  }
 }
 
 /* --- CALLING (WebRTC, signaled through Firestore) --- */
